@@ -2,6 +2,7 @@ import "./globals.css";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ReactNode } from "react";
+import { Button } from "@/components/Button";
 
 // (Optional) Site-wide metadata
 export const metadata: Metadata = {
@@ -12,35 +13,35 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
-      <body>
+      <body className="bg-[#F7FAFC] text-[#2D3748]">
         <div className="flex h-screen">
           {/* Left Pane / Sidebar */}
-          <aside className="w-64 bg-gray-100 p-4">
+          <aside className="w-64 bg-[#EDF2F7] p-4">
             <div className="mb-8">
-              <p className="text-xl font-bold">Aggy Dapp</p>
+              <p className="text-xl font-bold text-[#2B6CB0]">Aggy Dapp</p>
             </div>
             <nav className="space-y-2">
-              <Link href="/" className="block p-2 hover:bg-gray-200">
+              <Link href="/" className="block p-2 text-[#4A5568] hover:bg-[#E2E8F0] rounded-md">
                 Landing
               </Link>
-              <Link href="/submit" className="block p-2 hover:bg-gray-200">
+              <Link href="/submit" className="block p-2 text-[#4A5568] hover:bg-[#E2E8F0] rounded-md">
                 Submit Job
               </Link>
-              <Link href="/chat" className="block p-2 hover:bg-gray-200">
+              <Link href="/chat" className="block p-2 text-[#4A5568] hover:bg-[#E2E8F0] rounded-md">
                 Chat
               </Link>
-              <Link href="/tasks" className="block p-2 hover:bg-gray-200">
+              <Link href="/tasks" className="block p-2 text-[#4A5568] hover:bg-[#E2E8F0] rounded-md">
                 Task Board
               </Link>
               <Link
                 href="/pending-reviews"
-                className="block p-2 hover:bg-gray-200"
+                className="block p-2 text-[#4A5568] hover:bg-[#E2E8F0] rounded-md"
               >
                 Pending Reviews
               </Link>
               <Link
                 href="/completed-tasks"
-                className="block p-2 hover:bg-gray-200"
+                className="block p-2 text-[#4A5568] hover:bg-[#E2E8F0] rounded-md"
               >
                 Completed Tasks
               </Link>
@@ -50,15 +51,13 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           {/* Main Content Area */}
           <div className="flex-1 flex flex-col">
             {/* Header */}
-            <header className="flex items-center justify-between bg-white p-4 shadow">
-              <div className="font-bold text-lg">Aggy Logo</div>
-              <button className="px-4 py-2 bg-blue-500 text-white rounded">
-                Connect Wallet
-              </button>
+            <header className="flex items-center justify-between bg-white p-4 shadow-sm">
+              <div className="font-bold text-lg text-[#2B6CB0]">Aggy Logo</div>
+              <Button variant="primary">Connect Wallet</Button>
             </header>
 
             {/* Page Content */}
-            <main className="flex-1 overflow-y-auto p-4 bg-gray-50">
+            <main className="flex-1 overflow-y-auto p-4 bg-[#F7FAFC]">
               {children}
             </main>
           </div>

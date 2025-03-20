@@ -2,6 +2,9 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { Button } from "@/components/Button";
+import { Input } from "@/components/Input";
+import { Card } from "@/components/Card";
 
 interface Message {
   user: "hirer" | "agent";
@@ -30,38 +33,38 @@ export default function ChatPage() {
 
   return (
     <div className="max-w-2xl mx-auto">
-      <h2 className="text-xl font-bold mb-4">AI Refinement Chat</h2>
-      <div className="border p-4 mb-4 h-64 overflow-y-auto bg-white">
+      <h2 className="text-2xl font-bold mb-6 text-[#2D3748]">AI Refinement Chat</h2>
+      <Card className="mb-6 h-64 overflow-y-auto">
         {messages.map((msg, idx) => (
-          <div key={idx} className="mb-2">
-            <strong>{msg.user === "hirer" ? "You" : "AI"}:</strong> {msg.text}
+          <div key={idx} className="mb-4 last:mb-0">
+            <div className={`inline-block p-3 rounded-lg ${
+              msg.user === "hirer" 
+                ? "bg-[#2B6CB0] text-white ml-auto" 
+                : "bg-[#EDF2F7] text-[#2D3748]"
+            }`}>
+              <p className="text-sm font-medium mb-1">
+                {msg.user === "hirer" ? "You" : "AI"}
+              </p>
+              <p>{msg.text}</p>
+            </div>
           </div>
         ))}
-      </div>
+      </Card>
 
-      <div className="flex space-x-2">
-        <input
-          type="text"
-          className="border p-2 flex-1"
+      <div className="flex space-x-4">
+        <Input
           value={input}
           onChange={(e) => setInput(e.target.value)}
           placeholder="Type your message..."
+          onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
         />
-        <button
-          className="bg-blue-600 text-white px-4 py-2 rounded"
-          onClick={sendMessage}
-        >
-          Send
-        </button>
+        <Button onClick={sendMessage}>Send</Button>
       </div>
 
-      <div className="mt-4">
-        <button
-          className="bg-green-600 text-white px-4 py-2 rounded"
-          onClick={handlePostJob}
-        >
+      <div className="mt-6">
+        <Button variant="secondary" onClick={handlePostJob}>
           Post Job
-        </button>
+        </Button>
       </div>
     </div>
   );

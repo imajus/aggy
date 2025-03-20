@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { Button } from "@/components/Button";
+import { Card } from "@/components/Card";
 
 interface Task {
   id: string;
@@ -38,24 +40,21 @@ export default function TasksPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-4">Available Tasks</h1>
+      <h1 className="text-2xl font-bold mb-6 text-[#2D3748]">Available Tasks</h1>
       <div className="space-y-4">
         {tasks.map((task) => (
-          <div key={task.id} className="border p-4 rounded bg-white">
-            <h2 className="text-lg font-semibold">{task.title}</h2>
-            <p>{task.description}</p>
-            <p className="text-sm text-gray-600">
-              Price: {task.price} USDC <br />
-              Start Date: {task.startDate} <br />
-              Deadline: {task.deadline}
-            </p>
-            <button
-              className="bg-blue-600 text-white px-4 py-2 mt-2 rounded"
-              onClick={() => handleSelectTask(task.id)}
-            >
+          <Card key={task.id}>
+            <h2 className="text-lg font-semibold text-[#2D3748] mb-2">{task.title}</h2>
+            <p className="text-[#4A5568] mb-3">{task.description}</p>
+            <div className="text-sm text-[#718096] mb-4">
+              <p>Price: {task.price} USDC</p>
+              <p>Start Date: {task.startDate}</p>
+              <p>Deadline: {task.deadline}</p>
+            </div>
+            <Button variant="primary" onClick={() => handleSelectTask(task.id)}>
               Message Hirer
-            </button>
-          </div>
+            </Button>
+          </Card>
         ))}
       </div>
     </div>
