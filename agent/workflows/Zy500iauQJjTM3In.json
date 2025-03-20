@@ -1,0 +1,95 @@
+{
+  "createdAt": "2025-03-20T18:55:17.959Z",
+  "updatedAt": "2025-03-20T18:57:23.000Z",
+  "id": "Zy500iauQJjTM3In",
+  "name": "Aggy AI agent",
+  "active": false,
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "1214e4ce-2fb4-4638-9e6b-6b9177cd8d34",
+      "name": "When chat message received",
+      "webhookId": "3374f7a5-b68a-4139-836c-ae77d1140a2f"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.8,
+      "position": [
+        220,
+        0
+      ],
+      "id": "cbc8a125-98c2-46cb-a4d8-b2eac137d78f",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        200,
+        200
+      ],
+      "id": "4e0ea1b2-2f87-484b-9b2b-666301c81495",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "l3PyuxSuNhOWKxdX",
+          "name": "OpenAI account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "75301d39-b959-4a6c-b907-5d23cb8d8f3d",
+  "triggerCount": 0,
+  "tags": []
+}
