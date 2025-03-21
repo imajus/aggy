@@ -1,5 +1,8 @@
 FROM n8nio/n8n:latest
-# TODO: Maybe install missing NPM packages?
+# Install missing NPM packages
+USER root
+RUN npm i -g secretvaults
+USER node
 # Import workflows & credentials from the project
 COPY credentials /backup/credentials
 COPY workflows /backup/workflows
