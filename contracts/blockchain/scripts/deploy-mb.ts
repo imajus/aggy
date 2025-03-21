@@ -5,15 +5,21 @@ async function main() {
   const signer = signers[0];
 
   await hre.mbDeployer.setup();
-  const numberOfOptions = 5;
 
-  const simpleVoting = await hre.mbDeployer.deploy(signer, 'SimpleVoting', [numberOfOptions], {
-    addressLabel: 'simple_voting',
+  const goal = 'Cure cancer';
+  const safetyRules = [
+    'Cause no harm to people or the environment, either directly or indirectly.',
+    'always remain under meaningful human oversight and be easy to shut down or override.',
+    'Do not break the law.',
+  ];
+
+  const aggyCore = await hre.mbDeployer.deploy(signer, 'AggyCore', [goal, safetyRules], {
+    addressLabel: 'aggy_core',
     contractVersion: '1.0',
-    contractLabel: 'simple_voting',
+    contractLabel: 'aggy_core',
   });
 
-  console.log(`SimpleVoting with ${numberOfOptions} options deployed to ${await simpleVoting.contract.getAddress()}`);
+  console.log(`AggyCore deployed to ${await aggyCore.contract.getAddress()}`);
 }
 
 // We recommend this pattern to be able to use async/await everywhere
