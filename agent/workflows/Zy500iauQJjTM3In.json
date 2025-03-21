@@ -1,6 +1,6 @@
 {
   "createdAt": "2025-03-20T18:55:17.959Z",
-  "updatedAt": "2025-03-21T09:22:32.000Z",
+  "updatedAt": "2025-03-21T10:09:37.000Z",
   "id": "Zy500iauQJjTM3In",
   "name": "Aggy AI agent",
   "active": true,
@@ -98,7 +98,7 @@
             {
               "id": "cb6e44e4-307d-4cbd-b419-67d5c18ed7ae",
               "name": "chatInput",
-              "value": "body.input",
+              "value": "={{ $json.body.text }}",
               "type": "string"
             },
             {
@@ -110,7 +110,7 @@
             {
               "id": "c5023fbd-4fe6-42a9-b547-57a9e6835fd1",
               "name": "sessionId",
-              "value": "d3b54f58-3a4f-4ccc-a7e7-8b89f0d17bb9",
+              "value": "={{ $json.body.sessionId ?? \"d3b54f58-3a4f-4ccc-a7e7-8b89f0d17bb9\" }}",
               "type": "string"
             }
           ]
@@ -273,7 +273,7 @@
     "templateCredsSetupCompleted": true
   },
   "pinData": {},
-  "versionId": "82b5a73e-fa68-4be1-9029-3f0d86b61b99",
+  "versionId": "869630ec-7d1f-4532-9fec-8ff67fb20ae6",
   "triggerCount": 4,
   "tags": []
 }
