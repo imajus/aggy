@@ -6,7 +6,7 @@ The purpose of this project is to demonstrate how to build a frontend-only decen
 
 The repository consists of two sub-projects:
 
-- The `blockchain` folder contains a [Hardhat](https://hardhat.org/) project that uses the [Hardhat MultiBaas Plugin](https://github.com/curvegrid/hardhat-multibaas-plugin) to compile the `SimpleVoting` smart contract, deploy it to the network, and link it to a MultiBaas deployment so that we can interact with it via the REST API.
+- The `blockchain` folder contains a [Hardhat](https://hardhat.org/) project that uses the [Hardhat MultiBaas Plugin](https://github.com/curvegrid/hardhat-multibaas-plugin) to compile the `Aggy` smart contracts, deploy it to the network, and link it to a MultiBaas deployment so that we can interact with it via the REST API.
 - The `frontend` folder contains a Next.js web application that provides a UI for interacting with the smart contract using the [MultiBaas SDK](https://github.com/curvegrid/multibaas-sdk-typescript).
 
 ## MultiBaas Deployment Setup
@@ -37,7 +37,7 @@ Now, navigate to the `Admin > CORS Origins` page and add `http://localhost:3000`
 
 ## Contract Deployment via Hardhat
 
-If you have not yet deployed the `SimpleVoting.sol` smart contract to your MultiBaas deployment, we will now do so using the Hardhat project.
+If you have not yet deployed the `AggyCore.sol` smart contract to your MultiBaas deployment, we will now do so using the Hardhat project.
 
 Prepare the project for deployment:
 
