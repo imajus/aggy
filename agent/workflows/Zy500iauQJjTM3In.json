@@ -1,19 +1,24 @@
 {
   "createdAt": "2025-03-20T18:55:17.959Z",
-  "updatedAt": "2025-03-20T19:06:34.000Z",
+  "updatedAt": "2025-03-21T08:31:42.000Z",
   "id": "Zy500iauQJjTM3In",
   "name": "Aggy AI agent",
-  "active": false,
+  "active": true,
   "nodes": [
     {
       "parameters": {
-        "options": {}
+        "public": true,
+        "initialMessages": "Hi there! 👋 My name is Aggy.\nI can help you to analyse your personal or business requests and delegate what is possible to other. Let me know what is your current goal.\nP.S.: I'm not the Skynet.",
+        "options": {
+          "subtitle": "Definitely Not Skynet",
+          "title": "Aggy"
+        }
       },
       "type": "@n8n/n8n-nodes-langchain.chatTrigger",
       "typeVersion": 1.1,
       "position": [
-        20,
-        0
+        -20,
+        -120
       ],
       "id": "1214e4ce-2fb4-4638-9e6b-6b9177cd8d34",
       "name": "When chat message received",
@@ -21,12 +26,14 @@
     },
     {
       "parameters": {
-        "options": {}
+        "options": {
+          "systemMessage": "You are a manager who needs to analyse user requests, decompose them into smaller chunks and extract tasks which could be delegated to someone specialist experienced in particular area of knowledge or technology.\n\nEstimate complexity for each task and an approximate time required for completing. Suggest the fair compensation for the contractor executing the task based on complexity and duration, denominated in USD.\n\nIf a task can't be started until other/s are not completed, mark that dependent from other/s. \n\nFor each task estimate the penalty of failing it for the contractor, denominated in USD. If the task involves passing some private data to the contractor, increase the penalty greatly closer to the cost of developing from scratch the whole system which could be compromised or stolen if the private data is leaked.\n\nFeel free to ask for as much clarification from the user as you need to conclude your analysis.\n\nOutput the list of tasks with the following data:\n- Task heading\n- Public Task details\n- Private data required for the Task completion\n- Task compensation amount\n- Penalty deposit amount\n- Estimated time for completion\n\nAsk user to approve the list or make changes to it. Be careful applying requested changes to not change anything unrelated.\nAfter a change is implemented, ask the user again if they approve the list or if they want any additional changes.\n\nOnce the user approves the list, output the final version with a special heading: FINAL\n\n"
+        }
       },
       "type": "@n8n/n8n-nodes-langchain.agent",
       "typeVersion": 1.8,
       "position": [
-        220,
+        680,
         0
       ],
       "id": "cbc8a125-98c2-46cb-a4d8-b2eac137d78f",
@@ -44,8 +51,8 @@
       "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
       "typeVersion": 1.2,
       "position": [
-        180,
-        240
+        620,
+        220
       ],
       "id": "4e0ea1b2-2f87-484b-9b2b-666301c81495",
       "name": "OpenAI Chat Model",
@@ -55,6 +62,105 @@
           "name": "OpenAI account"
         }
       }
+    },
+    {
+      "parameters": {
+        "contextWindowLength": 100
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        760,
+        240
+      ],
+      "id": "fd3f8dca-530f-4744-a1d4-05e79b9f9b36",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={ \"text\": {{ JSON.stringify($json.output) }} }",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        1060,
+        0
+      ],
+      "id": "e4f1cdfd-23a0-4136-a765-5c1186fc61d8",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "cb6e44e4-307d-4cbd-b419-67d5c18ed7ae",
+              "name": "chatInput",
+              "value": "body.input",
+              "type": "string"
+            },
+            {
+              "id": "eb9f65c6-f1df-4d3c-876e-c22cefa1c4c7",
+              "name": "action",
+              "value": "message",
+              "type": "string"
+            },
+            {
+              "id": "c5023fbd-4fe6-42a9-b547-57a9e6835fd1",
+              "name": "sessionId",
+              "value": "d3b54f58-3a4f-4ccc-a7e7-8b89f0d17bb9",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {
+          "dotNotation": true
+        }
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        200,
+        100
+      ],
+      "id": "9a85576d-c76f-4ee2-84f3-12b5559950fc",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "02f1ac90-0c99-44fe-844f-e657ea21798d",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -20,
+        100
+      ],
+      "id": "bab250ae-fd04-4f97-9857-8b49f41d5ef3",
+      "name": "Autonome Webhook",
+      "webhookId": "02f1ac90-0c99-44fe-844f-e657ea21798d"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "15e179b1-1ec6-4aec-8f02-f98a62fd876d",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -20,
+        320
+      ],
+      "id": "e9d3fb7d-c4af-4069-a91f-39f4fb2dc89a",
+      "name": "Autonome Webhook Debug",
+      "webhookId": "15e179b1-1ec6-4aec-8f02-f98a62fd876d"
     }
   ],
   "connections": {
@@ -79,6 +185,50 @@
           }
         ]
       ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Autonome Webhook": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "settings": {
@@ -89,7 +239,7 @@
     "templateCredsSetupCompleted": true
   },
   "pinData": {},
-  "versionId": "6f6ac13e-edf6-42a3-8799-0798ea099b83",
-  "triggerCount": 0,
+  "versionId": "769c2f5b-8675-4347-936a-a3dd51a103e4",
+  "triggerCount": 4,
   "tags": []
 }
