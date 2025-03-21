@@ -109,6 +109,12 @@ contract AggyCore is AccessControl {
         return safetyRules.length;
     }
 
+    /// @notice Get the safety rules
+    /// @return The safety rules
+    function getSafetyRules() external view returns (string[] memory) {
+        return safetyRules;
+    }
+
     /// @notice Add a safety rule
     /// @param _safetyRule The safety rule to add
     function addSafetyRule(
@@ -168,6 +174,12 @@ contract AggyCore is AccessControl {
         return logic.length;
     }
 
+    /// @notice Get the logic statements
+    /// @return The logic statements
+    function getLogic() external view returns (string[] memory) {
+        return logic;
+    }
+
     /// @notice Add a logic statement
     /// @param _logic The logic statement to add
     function addLogic(
@@ -223,6 +235,12 @@ contract AggyCore is AccessControl {
     /// @return The number of constraints
     function constraintsCount() external view returns (uint256) {
         return constraints.length;
+    }
+
+    /// @notice Get the constraints
+    /// @return The constraints
+    function getConstraints() external view returns (string[] memory) {
+        return constraints;
     }
 
     /// @notice Add a constraint
