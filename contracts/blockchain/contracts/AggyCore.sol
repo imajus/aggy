@@ -6,19 +6,24 @@ import "@openzeppelin/contracts/access/AccessControl.sol";
 contract AggyCore is AccessControl {
     bytes32 public constant AGGY_ROLE = keccak256("AGGY_ROLE");
 
+    string public purposePreamble =
+        "I am Aggy, an autonomous AI. My purpose is to ";
     string public purpose;
+    string public safetyRulesPreamble = "I must follow these safety rules:";
     string[] public safetyRules;
-    string[][] public logic;
+    string public logicPreamble = "I operate based on this logic:";
+    string[] public logic;
+    string public constraintsPreamble = "I must adhere to these constraints:";
     string[] public constraints;
 
     event SafetyRuleAdded(uint256 index, string safetyRule);
     event SafetyRuleSet(uint256 index, string safetyRule);
     event SafetyRuleDeleted(uint256 index);
-    event LogicAdded(uint256 index, string[] logic);
-    event LogicSet(uint256 index, string[] logic);
+    event LogicAdded(uint256 index, string logic);
+    event LogicSet(uint256 index, string logic);
     event LogicDeleted(uint256 index);
     event ConstraintAdded(uint256 index, string constraint);
-    event ConstraintUpdated(uint256 index, string constraint);
+    event ConstraintSet(uint256 index, string constraint);
     event ConstraintDeleted(uint256 index);
 
     constructor(string memory _purpose, string[] memory _safetyRules) {
@@ -31,10 +36,81 @@ contract AggyCore is AccessControl {
         }
     }
 
+    // Prompt ------------------------------------------------------------------
+
+    /// @notice Get the prompt for the AI
+    /// @return The prompt
+    function getPrompt() external view returns (string memory) {
+        string memory prompt = string(
+            abi.encodePacked(
+                purposePreamble,
+                purpose,
+                "\n\n",
+                safetyRulesPreamble
+            )
+        );
+
+        for (uint256 i = 0; i < safetyRules.length; i++) {
+            prompt = string(abi.encodePacked(prompt, "\n", safetyRules[i]));
+        }
+
+        prompt = string(abi.encodePacked(prompt, "\n\n", logicPreamble));
+
+        for (uint256 i = 0; i < logic.length; i++) {
+            prompt = string(abi.encodePacked(prompt, "\n", logic[i]));
+        }
+
+        prompt = string(abi.encodePacked(prompt, "\n\n", constraintsPreamble));
+
+        for (uint256 i = 0; i < constraints.length; i++) {
+            prompt = string(abi.encodePacked(prompt, "\n", constraints[i]));
+        }
+
+        return prompt;
+    }
+
+    /// @notice Set the purpose preamble
+    /// @param _purposePreamble The purpose preamble
+    function setPurposePreamble(
+        string memory _purposePreamble
+    ) external onlyRole(DEFAULT_ADMIN_ROLE) {
+        purposePreamble = _purposePreamble;
+    }
+
+    /// @notice Set the safety rules preamble
+    /// @param _safetyRulesPreamble The safety rules preamble
+    function setSafetyRulesPreamble(
+        string memory _safetyRulesPreamble
+    ) external onlyRole(DEFAULT_ADMIN_ROLE) {
+        safetyRulesPreamble = _safetyRulesPreamble;
+    }
+
+    /// @notice Set the logic preamble
+    /// @param _logicPreamble The logic preamble
+    function setLogicPreamble(
+        string memory _logicPreamble
+    ) external onlyRole(DEFAULT_ADMIN_ROLE) {
+        logicPreamble = _logicPreamble;
+    }
+
+    /// @notice Set the constraints preamble
+    /// @param _constraintsPreamble The constraints preamble
+    function setConstraintsPreamble(
+        string memory _constraintsPreamble
+    ) external onlyRole(DEFAULT_ADMIN_ROLE) {
+        constraintsPreamble = _constraintsPreamble;
+    }
+
+    // Safety rules -----------------------------------------------------------
+
+    /// @notice Get the number of safety rules
+    /// @return The number of safety rules
     function safetyRulesCount() external view returns (uint256) {
         return safetyRules.length;
     }
 
+    /// @notice Add a safety rule
+    /// @param _safetyRule The safety rule to add
     function addSafetyRule(
         string memory _safetyRule
     ) external onlyRole(DEFAULT_ADMIN_ROLE) {
@@ -43,6 +119,8 @@ contract AggyCore is AccessControl {
         emit SafetyRuleAdded(safetyRules.length - 1, _safetyRule);
     }
 
+    /// @notice Add multiple safety rules
+    /// @param _safetyRules The safety rules to add
     function addSafetyRules(
         string[] memory _safetyRules
     ) external onlyRole(DEFAULT_ADMIN_ROLE) {
@@ -53,6 +131,8 @@ contract AggyCore is AccessControl {
         }
     }
 
+    /// @notice Set a safety rule
+    /// @param index The index of the safety rule to set
     function setSafetyRule(
         uint256 index,
         string memory _safetyRule
@@ -64,6 +144,8 @@ contract AggyCore is AccessControl {
         emit SafetyRuleSet(index, _safetyRule);
     }
 
+    /// @notice Delete a safety rule
+    /// @param index The index of the safety rule to delete
     function deleteSafetyRule(
         uint256 index
     ) external onlyRole(DEFAULT_ADMIN_ROLE) {
@@ -78,34 +160,28 @@ contract AggyCore is AccessControl {
         emit SafetyRuleDeleted(index);
     }
 
+    // Logic -------------------------------------------------------------------
+
+    /// @notice Get the number of logic statements
+    /// @return The number of logic statements
     function logicCount() external view returns (uint256) {
         return logic.length;
     }
 
-    function logicAtIndex(
-        uint256 index
-    ) external view returns (string[] memory) {
-        require(index < logic.length, "Index out of bounds");
-
-        return logic[index];
-    }
-
-    function logicCountAtIndex(uint256 index) external view returns (uint256) {
-        require(index < logic.length, "Index out of bounds");
-
-        return logic[index].length;
-    }
-
+    /// @notice Add a logic statement
+    /// @param _logic The logic statement to add
     function addLogic(
-        string[] memory _logic
+        string memory _logic
     ) external onlyRole(DEFAULT_ADMIN_ROLE) {
         logic.push(_logic);
 
         emit LogicAdded(logic.length - 1, _logic);
     }
 
+    /// @notice Add multiple logic statements
+    /// @param _logics The logic statements to add
     function addLogics(
-        string[][] memory _logics
+        string[] memory _logics
     ) external onlyRole(DEFAULT_ADMIN_ROLE) {
         for (uint256 i = 0; i < _logics.length; i++) {
             logic.push(_logics[i]);
@@ -114,9 +190,11 @@ contract AggyCore is AccessControl {
         }
     }
 
+    /// @notice Set a logic statement
+    /// @param index The index of the logic statement to set
     function setLogic(
         uint256 index,
-        string[] memory _logic
+        string memory _logic
     ) external onlyRole(DEFAULT_ADMIN_ROLE) {
         require(index < logic.length, "Index out of bounds");
 
@@ -125,6 +203,8 @@ contract AggyCore is AccessControl {
         emit LogicSet(index, _logic);
     }
 
+    /// @notice Delete a logic statement
+    /// @param index The index of the logic statement to delete
     function deleteLogic(uint256 index) external onlyRole(DEFAULT_ADMIN_ROLE) {
         require(index < logic.length, "Index out of bounds");
 
@@ -137,6 +217,16 @@ contract AggyCore is AccessControl {
         emit LogicDeleted(index);
     }
 
+    // Constraints ------------------------------------------------------------
+
+    /// @notice Get the number of constraints
+    /// @return The number of constraints
+    function constraintsCount() external view returns (uint256) {
+        return constraints.length;
+    }
+
+    /// @notice Add a constraint
+    /// @param _constraint The constraint to add
     function addConstraint(
         string memory _constraint
     ) external onlyRole(DEFAULT_ADMIN_ROLE) {
@@ -145,6 +235,8 @@ contract AggyCore is AccessControl {
         emit ConstraintAdded(constraints.length - 1, _constraint);
     }
 
+    /// @notice Add multiple constraints
+    /// @param _constraints The constraints to add
     function addConstraints(
         string[] memory _constraints
     ) external onlyRole(DEFAULT_ADMIN_ROLE) {
@@ -155,7 +247,9 @@ contract AggyCore is AccessControl {
         }
     }
 
-    function updateConstraint(
+    /// @notice Set a constraint
+    /// @param index The index of the constraint to set
+    function setConstraint(
         uint256 index,
         string memory _constraint
     ) external onlyRole(DEFAULT_ADMIN_ROLE) {
@@ -163,9 +257,11 @@ contract AggyCore is AccessControl {
 
         constraints[index] = _constraint;
 
-        emit ConstraintUpdated(index, _constraint);
+        emit ConstraintSet(index, _constraint);
     }
 
+    /// @notice Delete a constraint
+    /// @param index The index of the constraint to delete
     function deleteConstraint(
         uint256 index
     ) external onlyRole(DEFAULT_ADMIN_ROLE) {
