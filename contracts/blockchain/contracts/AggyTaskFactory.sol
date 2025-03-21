@@ -10,6 +10,7 @@ contract AggyTaskFactory is AccessControl {
 
     address[] public tasks;
     mapping(string => uint256) public TaskIdToIndex;
+    mapping(string => address) public TaskIdToAddress;
 
     modifier onlyAggy() {
         require(msg.sender == aggyCore, "AggyTaskFactory: must be Aggy");
@@ -37,23 +38,33 @@ contract AggyTaskFactory is AccessControl {
         IAggyTask.Task memory _taskData,
         address aggyToken
     ) external onlyAggy returns (address) {
+        // ensure we don't have a task with the same ID
+        require(
+            TaskIdToAddress[_taskData.id] == address(0),
+            "AggyTaskFactory: task already exists"
+        );
+
         // create the task
         AggyTask task = new AggyTask(aggyCore, aggyToken, _taskData);
 
         // add to indexes
         tasks.push(address(task));
         TaskIdToIndex[_taskData.id] = tasks.length - 1;
+        TaskIdToAddress[_taskData.id] = address(task);
 
         return address(task);
     }
 
-    /// @notice Get a task by ID
-    /// @param _taskId The task ID
-    /// @return The task
-    function getTaskById(
-        string memory _taskId
-    ) external view returns (IAggyTask.Task memory) {
-        return IAggyTask(tasks[TaskIdToIndex[_taskId]]).getTask();
+    /// @notice Get all task addresses
+    /// @return The task addresses
+    function getTaskAddresses() external view returns (address[] memory) {
+        return tasks;
+    }
+
+    /// @notice Get the number of tasks
+    /// @return The number of tasks
+    function getTaskCount() external view returns (uint256) {
+        return tasks.length;
     }
 
     /// @notice Get a task address by ID
@@ -62,7 +73,23 @@ contract AggyTaskFactory is AccessControl {
     function getTaskAddressById(
         string memory _taskId
     ) public view returns (address) {
-        return tasks[TaskIdToIndex[_taskId]];
+        require(
+            TaskIdToAddress[_taskId] != address(0),
+            "AggyTaskFactory: task not found"
+        );
+
+        return TaskIdToAddress[_taskId];
+    }
+
+    /// @notice Get a task by ID
+    /// @param _taskId The task ID
+    /// @return The task
+    function getTaskById(
+        string memory _taskId
+    ) external view returns (IAggyTask.Task memory) {
+        address taskAddress = getTaskAddressById(_taskId);
+
+        return IAggyTask(taskAddress).getTask();
     }
 
     /// @notice Get a task by index
@@ -83,17 +110,5 @@ contract AggyTaskFactory is AccessControl {
         }
 
         return taskDatas;
-    }
-
-    /// @notice Get all task addresses
-    /// @return The task addresses
-    function getTaskAddresses() external view returns (address[] memory) {
-        return tasks;
-    }
-
-    /// @notice Get the number of tasks
-    /// @return The number of tasks
-    function getTaskCount() external view returns (uint256) {
-        return tasks.length;
     }
 }

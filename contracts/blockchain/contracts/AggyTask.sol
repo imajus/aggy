@@ -41,6 +41,12 @@ contract AggyTask {
         return aggyToken.balanceOf(address(this));
     }
 
+    /// @notice Get the task's data
+    /// @return The task's data
+    function getTask() external view returns (IAggyTask.Task memory) {
+        return task;
+    }
+
     /// @notice Claim the task to start work on it
     function claimTask() external {
         require(

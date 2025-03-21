@@ -103,7 +103,7 @@ async function main() {
   const prompt = await aggyCore.getPrompt();
   console.log(`Prompt readback: ${prompt}\n`);
 
-  // Lifecycle check ---------------------------------------------------------
+  // Happy path lifecycle check -----------------------------------------------
 
   // create a task
   const deadline = Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 7; // 1 week from now
@@ -141,7 +141,7 @@ async function main() {
 
   await hre.mbDeployer.link(signer, 'AggyTask', taskAddress, {
     addressLabel: 'aggy_task_' + taskIdShort,
-    contractVersion: '1.1',
+    contractVersion: '1.2',
     contractLabel: 'aggy_task',
   });
 
