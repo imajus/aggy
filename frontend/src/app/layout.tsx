@@ -2,7 +2,8 @@ import "./globals.css";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ReactNode } from "react";
-import { Button } from "@/components/Button";
+import Providers from "@/components/providers";
+import { LoginWalletButton } from "@/components/LoginWalletButton";
 
 // (Optional) Site-wide metadata
 export const metadata: Metadata = {
@@ -11,8 +12,14 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
+
+  const handleConnect = () => {};
+
+
+
   return (
     <html lang="en">
+      <Providers>
       <body className="bg-[#F7FAFC] text-[#2D3748]">
         <div className="flex h-screen">
           {/* Left Pane / Sidebar */}
@@ -50,7 +57,8 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             {/* Header */}
             <header className="flex items-center justify-between bg-white p-4 shadow-sm">
               <div className="font-bold text-lg text-[#2B6CB0]">Aggy Logo</div>
-              <Button variant="primary">Connect Wallet</Button>
+              {/* <Button variant="primary" onClick={handleConnect}>Connect Wallet</Button> */}
+              <LoginWalletButton/>
             </header>
 
             {/* Page Content */}
@@ -60,6 +68,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           </div>
         </div>
       </body>
+      </Providers>
     </html>
   );
 }
