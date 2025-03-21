@@ -1,6 +1,6 @@
 {
   "createdAt": "2025-03-20T18:55:17.959Z",
-  "updatedAt": "2025-03-21T08:31:42.000Z",
+  "updatedAt": "2025-03-21T09:22:32.000Z",
   "id": "Zy500iauQJjTM3In",
   "name": "Aggy AI agent",
   "active": true,
@@ -161,6 +161,29 @@
       "id": "e9d3fb7d-c4af-4069-a91f-39f4fb2dc89a",
       "name": "Autonome Webhook Debug",
       "webhookId": "15e179b1-1ec6-4aec-8f02-f98a62fd876d"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c9e1cbf0-5c7d-4a05-9546-026890a80994",
+              "name": "text",
+              "value": "={{ JSON.stringify($json) }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        200,
+        320
+      ],
+      "id": "24b40397-6c7e-4cd4-9b89-a84eca8e2aed",
+      "name": "Edit Fields1"
     }
   ],
   "connections": {
@@ -229,6 +252,17 @@
           }
         ]
       ]
+    },
+    "Autonome Webhook Debug": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "settings": {
@@ -239,7 +273,7 @@
     "templateCredsSetupCompleted": true
   },
   "pinData": {},
-  "versionId": "769c2f5b-8675-4347-936a-a3dd51a103e4",
+  "versionId": "82b5a73e-fa68-4be1-9029-3f0d86b61b99",
   "triggerCount": 4,
   "tags": []
 }
