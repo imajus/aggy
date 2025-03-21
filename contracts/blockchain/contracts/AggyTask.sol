@@ -54,7 +54,11 @@ contract AggyTask {
         // transfer stake amount from contractor to this contract as a bond against failure
         // to complete the task by the contractor
         require(
-            aggyToken.transfer(task.contractor, task.stakeAmount),
+            aggyToken.transferFrom(
+                task.contractor,
+                address(this),
+                task.stakeAmount
+            ),
             "AggyTask: failed to transfer stake amount"
         );
 
