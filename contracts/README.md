@@ -1,4 +1,6 @@
-# MultiBaas Sample App
+# Aggy Smart Contracts
+
+_Most of the following is from the MultiBaas Sample App README_
 
 The purpose of this project is to demonstrate how to build a frontend-only decentralized application that uses [MultiBaas](https://docs.curvegrid.com/multibaas/) to handle the complexities of interacting with an EVM smart contract.
 
@@ -56,7 +58,7 @@ Now, you will need to fill in the fields of `deployment-config.development.js`.
 Finally, deploy the smart-contract:
 
 ```sh
-npm run deploy:voting:dev
+npm run deploy:aggy:dev
 ```
 
 Navigate to your MultiBaas deployment and confirm that you can see the contract on the `Contracts > On-Chain` page.
