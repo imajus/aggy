@@ -24,6 +24,6 @@ jobs:
         name: Build and push
         uses: docker/build-push-action@v6
         with:
-          context: ./agent
+          context: "{{defaultContext}}:agent"
           push: true
           tags: definitelynotskynet/aggy-agent:latest
