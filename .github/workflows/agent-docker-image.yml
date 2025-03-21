@@ -3,9 +3,7 @@ name: Docker Image CI
 on:
   push:
     branches: [ "main" ]
-    paths: |
-      "agent/**"
-      ".github/workflows/agent-docker-image.yml"
+    paths: "agent/**"
 
 jobs:
   docker:
