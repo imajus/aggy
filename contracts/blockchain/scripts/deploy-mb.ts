@@ -5,7 +5,12 @@ import {
   AggyToken__factory,
   IAggyTask,
   AggyTask__factory,
+  AggyCore,
+  AggyToken,
+  AggyTaskFactory,
+  AggyTask,
 } from '../typechain-types';
+import { Signer } from 'ethers';
 
 function taskToTuple(task: IAggyTask.TaskStruct): string {
   const tuple = [
@@ -21,6 +26,49 @@ function taskToTuple(task: IAggyTask.TaskStruct): string {
   ];
 
   return JSON.stringify(tuple);
+}
+
+async function runTaskLifecycle(
+  taskInput: IAggyTask.TaskStruct,
+  actionLabel: string,
+  aggyCore: AggyCore,
+  aggyTaskFactory: AggyTaskFactory,
+  aggyToken: AggyToken,
+  signer: Signer,
+  finalAction: (task: AggyTask, taskId: string) => Promise<void>,
+) {
+  console.log(`\n\n=== ${actionLabel} path lifecycle check ===`);
+
+  console.log(`Task tuple: ${taskToTuple(taskInput)}`);
+
+  await aggyCore.createTask(taskInput);
+  console.log('Task created');
+
+  await new Promise((resolve) => setTimeout(resolve, 2000));
+
+  const taskAddress = await aggyTaskFactory.getTaskAddressById(taskInput.id);
+  console.log(`Task address: ${taskAddress}`);
+
+  const taskIdShort = taskInput.id.split('-')[0];
+
+  await hre.mbDeployer.link(signer, 'AggyTask', taskAddress, {
+    addressLabel: 'aggy_task_' + taskIdShort,
+    contractVersion: '1.2',
+    contractLabel: 'aggy_task',
+  });
+
+  console.log('Getting some tokens in order to stake to the task');
+  await aggyCore.transferTokens(signer, taskInput.stakeAmount);
+
+  console.log('Approving tokens to the task');
+  await aggyToken.approve(taskAddress, taskInput.stakeAmount);
+
+  const task = AggyTask__factory.connect(taskAddress, signer);
+
+  console.log('Starting to work on the task');
+  await task.claimTask();
+
+  await finalAction(task, taskInput.id);
 }
 
 async function main() {
@@ -103,7 +151,7 @@ async function main() {
   const prompt = await aggyCore.getPrompt();
   console.log(`Prompt readback: ${prompt}\n`);
 
-  // Task data ---------------------------------------------------------------
+  // Setup and run task lifecycle checks --------------------------------------
 
   const longDeadline = Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 7; // 1 week from now
   const pastDeadline = Math.floor(Date.now() / 1000) - 60 * 60 * 24 * 7; // 1 week ago
@@ -140,149 +188,23 @@ async function main() {
     deadline: longDeadline,
   };
 
-  // Happy path lifecycle check ----------------------------------------------
+  await runTaskLifecycle(taskSuccess, 'Happy', aggyCore, aggyTaskFactory, aggyToken, signer, async (task, taskId) => {
+    console.log('Complete work on the task');
+    await task.completeTask();
 
-  console.log('\n\n=== Happy path lifecycle check ===');
-
-  // create a task
-
-  // output tuple version, for manual testing in MultiBaas
-  console.log(`Task tuple: ${taskToTuple(taskSuccess)}`);
-
-  await aggyCore.createTask(taskSuccess);
-
-  console.log('Task created');
-
-  // sleep for 2 seconds to allow the task to be created
-  await new Promise((resolve) => setTimeout(resolve, 2000));
-
-  // get the task address and link it in MultiBaas
-  let taskAddress = await aggyTaskFactory.getTaskAddressById(taskSuccess.id);
-
-  console.log(`Task address: ${taskAddress}`);
-
-  // parse the first chunk of the UUID out of the task ID to use as part of the address alias (label)
-  let taskIdShort = taskSuccess.id.split('-')[0];
-
-  await hre.mbDeployer.link(signer, 'AggyTask', taskAddress, {
-    addressLabel: 'aggy_task_' + taskIdShort,
-    contractVersion: '1.2',
-    contractLabel: 'aggy_task',
+    console.log('Confirm the task');
+    await aggyCore.confirmTask(taskId);
   });
 
-  // get some tokens
-  console.log('Getting some tokens in order to stake to the task');
-  await aggyCore.transferTokens(signer, 1000);
-
-  // approve tokens to the task
-  console.log('Approving tokens to the task');
-  await aggyToken.approve(taskAddress, 100);
-
-  // start to work on the task
-  let task = AggyTask__factory.connect(taskAddress, signer);
-
-  console.log('Starting to work on the task');
-  await task.claimTask();
-
-  console.log('Complete work on the task');
-  await task.completeTask();
-
-  console.log('Confirm the task');
-  await aggyCore.confirmTask(taskSuccess.id);
-
-  // Fail path lifecycle check -----------------------------------------------
-
-  console.log('\n\n=== Fail path lifecycle check ===');
-
-  // create a task
-
-  // output tuple version, for manual testing in MultiBaas
-  console.log(`Task tuple: ${taskToTuple(taskFail)}`);
-
-  await aggyCore.createTask(taskFail);
-
-  console.log('Task created');
-
-  // sleep for 2 seconds to allow the task to be created
-  await new Promise((resolve) => setTimeout(resolve, 2000));
-
-  // get the task address and link it in MultiBaas
-  taskAddress = await aggyTaskFactory.getTaskAddressById(taskFail.id);
-
-  console.log(`Task address: ${taskAddress}`);
-
-  // parse the first chunk of the UUID out of the task ID to use as part of the address alias (label)
-  taskIdShort = taskFail.id.split('-')[0];
-
-  await hre.mbDeployer.link(signer, 'AggyTask', taskAddress, {
-    addressLabel: 'aggy_task_' + taskIdShort,
-    contractVersion: '1.2',
-    contractLabel: 'aggy_task',
+  await runTaskLifecycle(taskFail, 'Fail', aggyCore, aggyTaskFactory, aggyToken, signer, async (_task, taskId) => {
+    console.log('Fail the task');
+    await aggyCore.failTask(taskId);
   });
 
-  // get some tokens
-  console.log('Getting some tokens in order to stake to the task');
-  await aggyCore.transferTokens(signer, 1000);
-
-  // approve tokens to the task
-  console.log('Approving tokens to the task');
-  await aggyToken.approve(taskAddress, 100);
-
-  // start to work on the task
-  task = AggyTask__factory.connect(taskAddress, signer);
-
-  console.log('Starting to work on the task');
-  await task.claimTask();
-
-  console.log('Fail the task');
-  await aggyCore.failTask(taskFail.id);
-
-  // Cancel path lifecycle check -----------------------------------------------
-
-  console.log('\n\n=== Cancel path lifecycle check ===');
-
-  // create a task
-
-  // output tuple version, for manual testing in MultiBaas
-  console.log(`Task tuple: ${taskToTuple(taskCancel)}`);
-
-  await aggyCore.createTask(taskCancel);
-
-  console.log('Task created');
-
-  // sleep for 2 seconds to allow the task to be created
-  await new Promise((resolve) => setTimeout(resolve, 2000));
-
-  // get the task address and link it in MultiBaas
-  taskAddress = await aggyTaskFactory.getTaskAddressById(taskCancel.id);
-
-  console.log(`Task address: ${taskAddress}`);
-
-  // parse the first chunk of the UUID out of the task ID to use as part of the address alias (label)
-  taskIdShort = taskFail.id.split('-')[0];
-
-  await hre.mbDeployer.link(signer, 'AggyTask', taskAddress, {
-    addressLabel: 'aggy_task_' + taskIdShort,
-    contractVersion: '1.2',
-    contractLabel: 'aggy_task',
+  await runTaskLifecycle(taskCancel, 'Cancel', aggyCore, aggyTaskFactory, aggyToken, signer, async (_task, taskId) => {
+    console.log('Cancel the task');
+    await aggyCore.cancelTask(taskId);
   });
-
-  // get some tokens
-  console.log('Getting some tokens in order to stake to the task');
-  await aggyCore.transferTokens(signer, 1000);
-
-  // approve tokens to the task
-  console.log('Approving tokens to the task');
-  await aggyToken.approve(taskAddress, 100);
-
-  // start to work on the task
-  task = AggyTask__factory.connect(taskAddress, signer);
-
-  console.log('Starting to work on the task');
-  await task.claimTask();
-
-  console.log('Cancel the task');
-  await aggyCore.cancelTask(taskFail.id);
 }
 
 // We recommend this pattern to be able to use async/await everywhere
