@@ -77,6 +77,12 @@ async function main() {
 
   await hre.mbDeployer.setup();
 
+  const adminAccounts = [
+    '0x0A2374C6659bd9dC9a2ECB13cb83C847dc4547D9', // D
+    '0xf991A961d45667F78A49D3D802fd0EDF65118924', // J
+  ];
+  const adminRole = '0x0000000000000000000000000000000000000000000000000000000000000000';
+
   // AggyToken ----------------------------------------------------------------
 
   const aggyTokenResult = await hre.mbDeployer.deploy(signer, 'AggyToken', [], {
@@ -142,11 +148,17 @@ async function main() {
 
   await aggyToken.initialize(aggyCoreAddress);
 
+  const aggyCore = AggyCore__factory.connect(aggyCoreAddress, signer);
+
+  // add admin role for all admin accounts
+  for (const adminAccount of adminAccounts) {
+    await aggyCore.grantRole(adminRole, adminAccount);
+    await aggyTaskFactory.grantRole(adminRole, adminAccount);
+  }
+
   console.log('Aggy setup complete');
 
   // Basic check -------------------------------------------------------------
-
-  const aggyCore = AggyCore__factory.connect(aggyCoreAddress, signer);
 
   const prompt = await aggyCore.getPrompt();
   console.log(`Prompt readback: ${prompt}\n`);
