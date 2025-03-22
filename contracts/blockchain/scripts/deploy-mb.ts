@@ -242,6 +242,8 @@ async function main() {
     console.log('Complete work on the task');
     await aggyCore.completeTask(taskId);
 
+    await sleep();
+
     console.log('Confirm the task');
     await aggyCore.confirmTask(taskId);
   });
