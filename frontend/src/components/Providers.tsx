@@ -1,14 +1,15 @@
+'use client';
+
 import { PrivyProvider } from "@privy-io/react-auth";
+import {base, baseSepolia} from 'viem/chains';
 import React from "react";
 
 export default function Providers({ children }: { children: React.ReactNode }) {
   const privyAppId = process.env.NEXT_PUBLIC_PRIVY_APP_ID || '';
-  const privyClientId = process.env.NEXT_PUBLIC_CLIENT_ID || '';
 
   return (
       <PrivyProvider
         appId={privyAppId}
-        clientId={privyClientId}
         config={{
           loginMethods: ['wallet','telegram','email'],
           appearance: {
@@ -16,6 +17,8 @@ export default function Providers({ children }: { children: React.ReactNode }) {
             accentColor: '#676FFF',
             logo: '',
           },
+          defaultChain: baseSepolia,
+          supportedChains: [base, baseSepolia],
           embeddedWallets: {
             createOnLogin: 'all-users'
           }

@@ -11,6 +11,7 @@ export function Button({
   variant = 'primary',
   size = 'md',
   children,
+  onClick,
   className = '',
   ...props
 }: ButtonProps) {
@@ -32,6 +33,7 @@ export function Button({
     <button
       className={`${baseStyles} ${variantStyles[variant]} ${sizeStyles[size]} ${className}`}
       {...props}
+      onClick={onClick}
     >
       {children}
     </button>
