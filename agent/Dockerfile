@@ -1,16 +1,17 @@
 FROM n8nio/n8n:latest
 # Install missing NPM packages
 USER root
-RUN npm i -g secretvaults
-USER node
+RUN npm i -g \
+	https://github.com/imajus/secretvaults-js.git#d3f9fcd94435692e405e59bce87cdf05c72bde80
 # Import workflows & credentials from the project
-COPY credentials /backup/credentials
-COPY workflows /backup/workflows
-RUN n8n import:credentials --separate --input=/backup/credentials
-RUN n8n import:workflow --separate --input=/backup/workflows
+USER node
+COPY credentials .n8n/backup/credentials
+COPY workflows .n8n/backup/workflows
+RUN n8n import:credentials --separate --input=.n8n/backup/credentials
+RUN n8n import:workflow --separate --input=.n8n/backup/workflows
 # Activate all workflows
 RUN n8n update:workflow --all --active=true
-# Allow passing the envruption key via environment variable
+# Allow passing custom encryption key
 RUN rm .n8n/config
 # Set environment variable defaults
 ENV N8N_PORT=3000
