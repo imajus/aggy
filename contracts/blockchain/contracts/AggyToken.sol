@@ -25,6 +25,11 @@ contract AggyToken is
         _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
     }
 
+    /// @notice Get the number of decimals
+    function decimals() public view virtual override returns (uint8) {
+        return 6;
+    }
+
     /// @notice Initialize the contract
     /// @param _aggyCore The AggyCore contract address
     function initialize(address _aggyCore) public onlyRole(DEFAULT_ADMIN_ROLE) {
@@ -36,7 +41,7 @@ contract AggyToken is
         _grantRole(MINTER_ROLE, _aggyCore);
 
         // initial supply
-        _mint(aggyCore, 1000000000 * 10 ** decimals());
+        _mint(aggyCore, 1000000000 * (10 ** decimals()));
 
         _revokeRole(DEFAULT_ADMIN_ROLE, msg.sender);
     }
