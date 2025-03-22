@@ -14,3 +14,9 @@ RUN n8n import:workflow --separate --input=.n8n/backup/workflows
 RUN n8n update:workflow --id=Zy500iauQJjTM3In --active=true
 # Allow passing custom encryption key
 RUN rm .n8n/config
+# Init environment variable defaults
+ENV N8N_PORT=3000
+ENV NODE_ENV=production
+ENV NODE_FUNCTION_ALLOW_BUILTIN=*
+ENV NODE_FUNCTION_ALLOW_EXTERNAL=*
+ENV N8N_DISABLE_UI=true
