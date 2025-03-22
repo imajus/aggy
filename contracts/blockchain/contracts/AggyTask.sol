@@ -18,12 +18,14 @@ contract AggyTask {
     constructor(
         address _aggyCore,
         address _aggyToken,
+        address _requester,
         IAggyTask.TaskData memory _taskData
     ) {
         aggyCore = _aggyCore;
         aggyToken = IAggyToken(_aggyToken);
 
         task.data = _taskData;
+        task.state.requester = _requester;
 
         emit IAggyTask.TaskCreated(address(this), task);
     }
@@ -40,37 +42,27 @@ contract AggyTask {
     }
 
     /// @notice Claim the task to start work on it
-    function claimTask() external {
+    /// @param _contractor The contractor's address
+    function claimTask(address _contractor) external onlyAggy {
         require(
             task.state.status == IAggyTask.TaskStatus.Created,
             "AggyTask: task must be Created"
         );
 
         task.state.status = IAggyTask.TaskStatus.InProgress;
-        task.state.contractor = msg.sender;
-
-        // transfer stake amount from contractor to this contract as a bond against failure
-        // to complete the task by the contractor
-        require(
-            aggyToken.transferFrom(
-                task.state.contractor,
-                address(this),
-                task.data.stakeAmount
-            ),
-            "AggyTask: failed to transfer stake amount"
-        );
+        task.state.contractor = _contractor;
 
         emit IAggyTask.TaskClaimed(address(this), task);
     }
 
     /// @notice Complete the task and put it into a review state
-    function completeTask() external {
+    function completeTask(address _contractor) external onlyAggy {
         require(
             task.state.status == IAggyTask.TaskStatus.InProgress,
             "AggyTask: task must be InProgress"
         );
         require(
-            msg.sender == task.state.contractor,
+            _contractor == task.state.contractor,
             "AggyTask: must be contractor"
         );
 
@@ -110,10 +102,10 @@ contract AggyTask {
 
         task.state.status = IAggyTask.TaskStatus.Failed;
 
-        // transfer stake and reward amounts from this contract to Aggy Core
+        // transfer stake and reward amounts from this contract to the requester
         require(
             aggyToken.transfer(
-                aggyCore,
+                task.state.requester,
                 task.data.stakeAmount + task.data.rewardAmount // could also do AggyToken.balanceOf(address(this))
             ),
             "AggyTask: failed to transfer stake and reward amounts"
@@ -123,23 +115,26 @@ contract AggyTask {
     }
 
     /// @notice Cancel the task and transfer the stake and reward amounts back to contractor and Aggy Core
-    function cancelTask() external onlyAggy {
+    function cancelTask(address _requester) external onlyAggy {
         require(
             task.state.status == IAggyTask.TaskStatus.Created ||
-                task.state.status == IAggyTask.TaskStatus.InProgress || // allow cancelling in progress tasks
-                task.state.status == IAggyTask.TaskStatus.UnderReview,
-            "AggyTask: task must not be Confirmed, Failed, or Cancelled"
+                task.state.status == IAggyTask.TaskStatus.InProgress,
+            "AggyTask: task must be Created or InProgress"
+        );
+        require(
+            _requester == task.state.requester,
+            "AggyTask: must be requester"
         );
 
         task.state.status = IAggyTask.TaskStatus.Cancelled;
 
-        // split the difference - transfer stake amount back to contractor and reward amount back to Aggy Core
+        // split the difference - transfer stake amount back to contractor and reward amount back to the requester
         require(
             aggyToken.transfer(task.state.contractor, task.data.stakeAmount),
             "AggyTask: failed to transfer stake amount"
         );
         require(
-            aggyToken.transfer(aggyCore, task.data.rewardAmount),
+            aggyToken.transfer(task.state.requester, task.data.rewardAmount),
             "AggyTask: failed to transfer reward amount"
         );
 

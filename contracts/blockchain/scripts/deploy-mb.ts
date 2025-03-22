@@ -4,11 +4,9 @@ import {
   AggyTaskFactory__factory,
   AggyToken__factory,
   IAggyTask,
-  AggyTask__factory,
   AggyCore,
   AggyToken,
   AggyTaskFactory,
-  AggyTask,
 } from '../typechain-types';
 import { Signer } from 'ethers';
 
@@ -35,9 +33,21 @@ async function runTaskLifecycle(
   aggyTaskFactory: AggyTaskFactory,
   aggyToken: AggyToken,
   signer: Signer,
-  finalAction: (task: AggyTask, taskId: string) => Promise<void>,
+  finalAction: (taskId: string) => Promise<void>,
 ) {
   console.log(`\n\n=== ${actionLabel} path lifecycle check ===`);
+
+  const aggyCoreAddress = aggyCore.getAddress();
+
+  // note that we are using the signer as the requester _and_ the contractor
+  // for this simple test script, whereas we would expect them to be different
+  // in a real-world scenario
+
+  console.log('Getting some tokens in order to incentivize a reward to the task');
+  await aggyCore.transferTokens(signer, taskInput.rewardAmount);
+
+  console.log('Approving reward tokens to Aggy Core');
+  await aggyToken.approve(aggyCoreAddress, taskInput.rewardAmount);
 
   console.log(`Task tuple: ${taskDataToTuple(taskInput)}`);
 
@@ -53,22 +63,20 @@ async function runTaskLifecycle(
 
   await hre.mbDeployer.link(signer, 'AggyTask', taskAddress, {
     addressLabel: 'aggy_task_' + taskIdShort,
-    contractVersion: '1.3',
+    contractVersion: '1.4',
     contractLabel: 'aggy_task',
   });
 
   console.log('Getting some tokens in order to stake to the task');
   await aggyCore.transferTokens(signer, taskInput.stakeAmount);
 
-  console.log('Approving tokens to the task');
-  await aggyToken.approve(taskAddress, taskInput.stakeAmount);
-
-  const task = AggyTask__factory.connect(taskAddress, signer);
+  console.log('Approving stake tokens to Aggy Core');
+  await aggyToken.approve(aggyCoreAddress, taskInput.stakeAmount);
 
   console.log('Starting to work on the task');
-  await task.claimTask();
+  await aggyCore.claimTask(taskInput.id);
 
-  await finalAction(task, taskInput.id);
+  await finalAction(taskInput.id);
 }
 
 async function main() {
@@ -82,7 +90,7 @@ async function main() {
     '0xf991A961d45667F78A49D3D802fd0EDF65118924', // J
   ];
   const adminRole = '0x0000000000000000000000000000000000000000000000000000000000000000';
-  const agentRole = '0xcab5a0bfe0b79d2c4b1c2e02599fa044d115b7511f9659307cb4276950967709';
+  const verifierRole = '0x0ce23c3e399818cfee81a7ab0880f714e53d7672b08df0fa62f2843416e1ea09';
 
   // AggyToken ----------------------------------------------------------------
 
@@ -154,7 +162,7 @@ async function main() {
   // add admin role for all admin accounts
   for (const adminAccount of adminAccounts) {
     await aggyCore.grantRole(adminRole, adminAccount);
-    await aggyCore.grantRole(agentRole, adminAccount);
+    await aggyCore.grantRole(verifierRole, adminAccount);
     await aggyTaskFactory.grantRole(adminRole, adminAccount);
   }
 
@@ -196,20 +204,20 @@ async function main() {
     deadline: longDeadline,
   };
 
-  await runTaskLifecycle(taskSuccess, 'Happy', aggyCore, aggyTaskFactory, aggyToken, signer, async (task, taskId) => {
+  await runTaskLifecycle(taskSuccess, 'Happy', aggyCore, aggyTaskFactory, aggyToken, signer, async (taskId) => {
     console.log('Complete work on the task');
-    await task.completeTask();
+    await aggyCore.completeTask(taskId);
 
     console.log('Confirm the task');
     await aggyCore.confirmTask(taskId);
   });
 
-  await runTaskLifecycle(taskFail, 'Fail', aggyCore, aggyTaskFactory, aggyToken, signer, async (_task, taskId) => {
+  await runTaskLifecycle(taskFail, 'Fail', aggyCore, aggyTaskFactory, aggyToken, signer, async (taskId) => {
     console.log('Fail the task');
     await aggyCore.failTask(taskId);
   });
 
-  await runTaskLifecycle(taskCancel, 'Cancel', aggyCore, aggyTaskFactory, aggyToken, signer, async (_task, taskId) => {
+  await runTaskLifecycle(taskCancel, 'Cancel', aggyCore, aggyTaskFactory, aggyToken, signer, async (taskId) => {
     console.log('Cancel the task');
     await aggyCore.cancelTask(taskId);
   });

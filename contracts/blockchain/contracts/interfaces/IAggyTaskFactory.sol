@@ -5,9 +5,12 @@ import "./IAggyTask.sol";
 
 interface IAggyTaskFactory {
     function createTask(
-        IAggyTask.TaskData memory _taskData,
-        address _aggyToken
+        address _aggyToken,
+        address _requester,
+        IAggyTask.TaskData memory _taskData
     ) external returns (address);
 
-    function getTaskAddressById(string memory _taskId) external view returns (address);
+    function getTaskAddressById(
+        string memory _taskId
+    ) external view returns (address);
 }

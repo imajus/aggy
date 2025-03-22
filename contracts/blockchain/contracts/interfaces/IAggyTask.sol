@@ -23,6 +23,7 @@ interface IAggyTask {
     struct TaskState {
         TaskStatus status;
         address contractor;
+        address requester;
     }
 
     struct Task {
@@ -39,9 +40,13 @@ interface IAggyTask {
 
     function getTask() external view returns (Task memory);
 
+    function claimTask(address _contractor) external;
+
+    function completeTask(address _contractor) external;
+
     function confirmTask() external;
 
     function failTask() external;
 
-    function cancelTask() external;
+    function cancelTask(address _requester) external;
 }

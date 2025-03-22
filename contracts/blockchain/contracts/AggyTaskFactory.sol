@@ -33,10 +33,14 @@ contract AggyTaskFactory is AccessControl {
     // Tasks -------------------------------------------------------------------
 
     /// @notice Create a task
+    /// @param _aggyToken The AggyToken address
+    /// @param _requester The requester address
     /// @param _taskData The task data
+    /// @return The task address
     function createTask(
-        IAggyTask.TaskData memory _taskData,
-        address aggyToken
+        address _aggyToken,
+        address _requester,
+        IAggyTask.TaskData memory _taskData
     ) external onlyAggy returns (address) {
         // ensure we don't have a task with the same ID
         require(
@@ -45,7 +49,12 @@ contract AggyTaskFactory is AccessControl {
         );
 
         // create the task
-        AggyTask task = new AggyTask(aggyCore, aggyToken, _taskData);
+        AggyTask task = new AggyTask(
+            aggyCore,
+            _aggyToken,
+            _requester,
+            _taskData
+        );
 
         // add to indexes
         tasks.push(address(task));

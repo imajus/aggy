@@ -6,7 +6,7 @@ import "./interfaces/IAggyTaskFactory.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
 
 contract AggyCore is AccessControl {
-    bytes32 public constant AGENT_ROLE = keccak256("AGENT_ROLE");
+    bytes32 public constant VERIFIER_ROLE = keccak256("VERIFIER_ROLE");
 
     IAggyTaskFactory public taskFactory;
     IAggyToken public aggyToken;
@@ -34,7 +34,7 @@ contract AggyCore is AccessControl {
         IAggyToken _aggyToken
     ) {
         _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
-        _grantRole(AGENT_ROLE, msg.sender); // for debugging, remove later
+        _grantRole(VERIFIER_ROLE, msg.sender); // for debugging, remove later
 
         purpose = _purpose;
 
@@ -54,38 +54,69 @@ contract AggyCore is AccessControl {
 
     /// @notice Create a task
     /// @param _taskData The task data
-    function createTask(
-        IAggyTask.TaskData memory _taskData
-    ) external onlyRole(AGENT_ROLE) {
+    function createTask(IAggyTask.TaskData memory _taskData) external {
         // create the task
-        address task = taskFactory.createTask(_taskData, address(aggyToken));
+        address task = taskFactory.createTask(
+            address(aggyToken),
+            msg.sender,
+            _taskData
+        );
 
         // transfer the reward tokens
         require(
-            aggyToken.transfer(task, _taskData.rewardAmount),
+            aggyToken.transferFrom(msg.sender, task, _taskData.rewardAmount),
             "AggyCore: failed to transfer reward amount"
         );
     }
 
+    /// @notice Claim a task by ID
+    /// @param taskId The task ID
+    function claimTask(string memory taskId) external {
+        address taskAddress = taskFactory.getTaskAddressById(taskId);
+        IAggyTask(taskAddress).claimTask(msg.sender);
+
+        IAggyTask.Task memory task = IAggyTask(taskAddress).getTask();
+
+        // transfer stake amount from contractor to the task contract as a bond against failure
+        // to complete the task by the contractor
+        require(
+            aggyToken.transferFrom(
+                task.state.contractor,
+                taskAddress,
+                task.data.stakeAmount
+            ),
+            "AggyTask: failed to transfer stake amount"
+        );
+    }
+
+    /// @notice Complete a task by ID
+    /// @param taskId The task ID
+    function completeTask(string memory taskId) external {
+        address taskAddress = taskFactory.getTaskAddressById(taskId);
+        IAggyTask(taskAddress).completeTask(msg.sender);
+    }
+
     /// @notice Confirm a task by ID
     /// @param taskId The task ID
-    function confirmTask(string memory taskId) external onlyRole(AGENT_ROLE) {
+    function confirmTask(
+        string memory taskId
+    ) external onlyRole(VERIFIER_ROLE) {
         address taskAddress = taskFactory.getTaskAddressById(taskId);
         IAggyTask(taskAddress).confirmTask();
     }
 
     /// @notice Fail a task by ID
     /// @param taskId The task ID
-    function failTask(string memory taskId) external onlyRole(AGENT_ROLE) {
+    function failTask(string memory taskId) external onlyRole(VERIFIER_ROLE) {
         address taskAddress = taskFactory.getTaskAddressById(taskId);
         IAggyTask(taskAddress).failTask();
     }
 
     /// @notice Cancel a task by ID
     /// @param taskId The task ID
-    function cancelTask(string memory taskId) external onlyRole(AGENT_ROLE) {
+    function cancelTask(string memory taskId) external {
         address taskAddress = taskFactory.getTaskAddressById(taskId);
-        IAggyTask(taskAddress).cancelTask();
+        IAggyTask(taskAddress).cancelTask(msg.sender);
     }
 
     // Tokens ------------------------------------------------------------------
