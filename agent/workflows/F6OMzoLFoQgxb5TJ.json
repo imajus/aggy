@@ -1,6 +1,6 @@
 {
   "createdAt": "2025-03-21T14:32:53.505Z",
-  "updatedAt": "2025-03-22T12:55:11.000Z",
+  "updatedAt": "2025-03-22T13:43:01.000Z",
   "id": "F6OMzoLFoQgxb5TJ",
   "name": "Privy: Get user wallet data",
   "active": false,
@@ -223,52 +223,15 @@
   "staticData": null,
   "meta": null,
   "pinData": {
-    "Get user accounts": [
-      {
-        "json": {
-          "id": "did:privy:cm8k5dhme02njjm4wwsfruvx9",
-          "created_at": 1742644219,
-          "linked_accounts": [
-            {
-              "type": "email",
-              "address": "denis.perov+aggy@gmail.com",
-              "verified_at": 1742644219,
-              "first_verified_at": null,
-              "latest_verified_at": null
-            },
-            {
-              "id": null,
-              "type": "wallet",
-              "address": "0xCB4C94A027D461AcCd4A0C28322d556fa6d73D9b",
-              "wallet_index": 0,
-              "chain_id": "eip155:1",
-              "chain_type": "ethereum",
-              "delegated": false,
-              "wallet_client": "privy",
-              "wallet_client_type": "privy",
-              "connector_type": "embedded",
-              "imported": false,
-              "recovery_method": "privy",
-              "verified_at": 1742644219,
-              "first_verified_at": 1742644219,
-              "latest_verified_at": 1742644219
-            }
-          ],
-          "mfa_methods": [],
-          "has_accepted_terms": false,
-          "is_guest": false
-        }
-      }
-    ],
     "When Executed by Another Workflow": [
       {
         "json": {
-          "userId": "cm8k5dhme02njjm4wwsfruvx9"
+          "userId": "cm8k7kgle005mday68m1l2zlz"
         }
       }
     ]
   },
-  "versionId": "ec3c7660-09cc-44e3-944e-0a89d1abae69",
+  "versionId": "13123388-d338-4883-9934-ae0461a55a43",
   "triggerCount": 0,
   "tags": []
 }
