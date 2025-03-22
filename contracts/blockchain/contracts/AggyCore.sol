@@ -53,16 +53,16 @@ contract AggyCore is AccessControl {
     // Tasks -------------------------------------------------------------------
 
     /// @notice Create a task
-    /// @param _task The task
+    /// @param _taskData The task data
     function createTask(
-        IAggyTask.Task memory _task
+        IAggyTask.TaskData memory _taskData
     ) external onlyRole(AGENT_ROLE) {
         // create the task
-        address task = taskFactory.createTask(_task, address(aggyToken));
+        address task = taskFactory.createTask(_taskData, address(aggyToken));
 
         // transfer the reward tokens
         require(
-            aggyToken.transfer(task, _task.rewardAmount),
+            aggyToken.transfer(task, _taskData.rewardAmount),
             "AggyCore: failed to transfer reward amount"
         );
     }

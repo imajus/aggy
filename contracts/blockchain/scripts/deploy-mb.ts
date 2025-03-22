@@ -16,9 +16,9 @@ function taskToTuple(task: IAggyTask.TaskStruct): string {
   const tuple = [
     task.name,
     task.id,
-    Number(task.status),
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-explicit-any
-    typeof task.contractor === 'string' ? task.contractor : (task.contractor as any).address,
+    // Number(task.status),
+    // // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-explicit-any
+    // typeof task.contractor === 'string' ? task.contractor : (task.contractor as any).address,
     task.details,
     task.rewardAmount.toString(),
     task.stakeAmount.toString(),
@@ -82,6 +82,7 @@ async function main() {
     '0xf991A961d45667F78A49D3D802fd0EDF65118924', // J
   ];
   const adminRole = '0x0000000000000000000000000000000000000000000000000000000000000000';
+  const agentRole = '0xcab5a0bfe0b79d2c4b1c2e02599fa044d115b7511f9659307cb4276950967709';
 
   // AggyToken ----------------------------------------------------------------
 
@@ -153,6 +154,7 @@ async function main() {
   // add admin role for all admin accounts
   for (const adminAccount of adminAccounts) {
     await aggyCore.grantRole(adminRole, adminAccount);
+    await aggyCore.grantRole(agentRole, adminAccount);
     await aggyTaskFactory.grantRole(adminRole, adminAccount);
   }
 
@@ -171,8 +173,6 @@ async function main() {
   const taskSuccess: IAggyTask.TaskStruct = {
     name: 'Raise capital',
     id: '3f8c2c74-2a0f-4f1c-bbe7-118fdacfa4a6',
-    status: 0,
-    contractor: signer,
     details: 'Reach out to 10 VCs and offer to sell them 100,000 tokens in exchange for 1% of the tokens.',
     rewardAmount: 100,
     stakeAmount: 100,
@@ -182,8 +182,6 @@ async function main() {
   const taskFail: IAggyTask.TaskStruct = {
     name: 'Build a research center',
     id: 'a7b8f342-4e99-4c29-b8e0-1a2a8b799f0c',
-    status: 0,
-    contractor: signer,
     details: 'Interview potential construction firms.',
     rewardAmount: 300,
     stakeAmount: 400,
@@ -192,8 +190,6 @@ async function main() {
   const taskCancel: IAggyTask.TaskStruct = {
     name: 'Rally supporters',
     id: '1c3d5ea1-9f6b-4a61-a4c2-bf2d67864e75',
-    status: 0,
-    contractor: signer,
     details: 'Start a social media account and post once a week.',
     rewardAmount: 50,
     stakeAmount: 600,

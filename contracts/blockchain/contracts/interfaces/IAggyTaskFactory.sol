@@ -5,7 +5,7 @@ import "./IAggyTask.sol";
 
 interface IAggyTaskFactory {
     function createTask(
-        IAggyTask.Task memory _taskData,
+        IAggyTask.TaskData memory _taskData,
         address _aggyToken
     ) external returns (address);
 

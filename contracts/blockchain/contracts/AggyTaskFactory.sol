@@ -33,9 +33,9 @@ contract AggyTaskFactory is AccessControl {
     // Tasks -------------------------------------------------------------------
 
     /// @notice Create a task
-    /// @param _taskData The task
+    /// @param _taskData The task data
     function createTask(
-        IAggyTask.Task memory _taskData,
+        IAggyTask.TaskData memory _taskData,
         address aggyToken
     ) external onlyAggy returns (address) {
         // ensure we don't have a task with the same ID
@@ -104,11 +104,10 @@ contract AggyTaskFactory is AccessControl {
     /// @notice Get all tasks
     /// @return The tasks
     function getTasks() external view returns (IAggyTask.Task[] memory) {
-        IAggyTask.Task[] memory taskDatas = new IAggyTask.Task[](tasks.length);
+        IAggyTask.Task[] memory allTasks = new IAggyTask.Task[](tasks.length);
         for (uint256 i = 0; i < tasks.length; i++) {
-            taskDatas[i] = IAggyTask(tasks[i]).getTask();
+            allTasks[i] = IAggyTask(tasks[i]).getTask();
         }
-
-        return taskDatas;
+        return allTasks;
     }
 }

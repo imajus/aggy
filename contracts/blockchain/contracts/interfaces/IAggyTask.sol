@@ -11,16 +11,31 @@ interface IAggyTask {
         Cancelled
     }
 
-    struct Task {
+    struct TaskData {
         string name;
         string id; // UUID string
-        TaskStatus status;
-        address contractor;
         string details;
         uint256 rewardAmount;
         uint256 stakeAmount;
         uint256 deadline; // UNIX timestamp
     }
+
+    struct TaskState {
+        TaskStatus status;
+        address contractor;
+    }
+
+    struct Task {
+        TaskData data;
+        TaskState state;
+    }
+
+    event TaskCreated(address indexed taskAddress, IAggyTask.Task task);
+    event TaskClaimed(address indexed taskAddress, IAggyTask.Task task);
+    event TaskCompleted(address indexed taskAddress, IAggyTask.Task task);
+    event TaskConfirmed(address indexed taskAddress, IAggyTask.Task task);
+    event TaskFailed(address indexed taskAddress, IAggyTask.Task task);
+    event TaskCancelled(address indexed taskAddress, IAggyTask.Task task);
 
     function getTask() external view returns (Task memory);
 
