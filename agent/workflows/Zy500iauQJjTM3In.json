@@ -1,6 +1,6 @@
 {
   "createdAt": "2025-03-20T18:55:17.959Z",
-  "updatedAt": "2025-03-21T15:23:24.000Z",
+  "updatedAt": "2025-03-22T18:01:22.000Z",
   "id": "Zy500iauQJjTM3In",
   "name": "Aggy AI agent",
   "active": true,
@@ -17,7 +17,7 @@
       "type": "@n8n/n8n-nodes-langchain.chatTrigger",
       "typeVersion": 1.1,
       "position": [
-        -20,
+        140,
         -120
       ],
       "id": "1214e4ce-2fb4-4638-9e6b-6b9177cd8d34",
@@ -110,7 +110,7 @@
             {
               "id": "c5023fbd-4fe6-42a9-b547-57a9e6835fd1",
               "name": "sessionId",
-              "value": "={{ $json.body.sessionId ?? \"d3b54f58-3a4f-4ccc-a7e7-8b89f0d17bb9\" }}",
+              "value": "={{ $json.body.sessionId }}",
               "type": "string"
             }
           ]
@@ -122,7 +122,7 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        200,
+        360,
         100
       ],
       "id": "9a85576d-c76f-4ee2-84f3-12b5559950fc",
@@ -138,52 +138,12 @@
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2,
       "position": [
-        -20,
+        140,
         100
       ],
       "id": "bab250ae-fd04-4f97-9857-8b49f41d5ef3",
       "name": "Autonome Webhook",
       "webhookId": "02f1ac90-0c99-44fe-844f-e657ea21798d"
-    },
-    {
-      "parameters": {
-        "httpMethod": "POST",
-        "path": "15e179b1-1ec6-4aec-8f02-f98a62fd876d",
-        "responseMode": "lastNode",
-        "options": {}
-      },
-      "type": "n8n-nodes-base.webhook",
-      "typeVersion": 2,
-      "position": [
-        -20,
-        320
-      ],
-      "id": "e9d3fb7d-c4af-4069-a91f-39f4fb2dc89a",
-      "name": "Autonome Webhook Debug",
-      "webhookId": "15e179b1-1ec6-4aec-8f02-f98a62fd876d"
-    },
-    {
-      "parameters": {
-        "assignments": {
-          "assignments": [
-            {
-              "id": "c9e1cbf0-5c7d-4a05-9546-026890a80994",
-              "name": "text",
-              "value": "={{ JSON.stringify($json) }}",
-              "type": "string"
-            }
-          ]
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.set",
-      "typeVersion": 3.4,
-      "position": [
-        200,
-        320
-      ],
-      "id": "24b40397-6c7e-4cd4-9b89-a84eca8e2aed",
-      "name": "Edit Fields1"
     },
     {
       "parameters": {},
@@ -264,17 +224,6 @@
         ]
       ]
     },
-    "Autonome Webhook Debug": {
-      "main": [
-        [
-          {
-            "node": "Edit Fields1",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "Calculator": {
       "ai_tool": [
         [
@@ -295,7 +244,7 @@
     "templateCredsSetupCompleted": true
   },
   "pinData": {},
-  "versionId": "d4d57795-d97c-4cc2-9bb0-5633147ba359",
-  "triggerCount": 4,
+  "versionId": "724b282a-89f0-4006-9740-6f2f146f7c56",
+  "triggerCount": 3,
   "tags": []
 }
