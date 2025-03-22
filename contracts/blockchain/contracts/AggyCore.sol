@@ -121,6 +121,12 @@ contract AggyCore is AccessControl {
 
     // Tokens ------------------------------------------------------------------
 
+    /// @notice Get the number of decimals of the token
+    /// @return The number of decimals
+    function decimals() public view returns (uint8) {
+        return aggyToken.decimals();
+    }
+
     /// @notice Transfer tokens
     /// @param to The recipient
     /// @param amount The amount
