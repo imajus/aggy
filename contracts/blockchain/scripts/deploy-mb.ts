@@ -63,7 +63,7 @@ async function runTaskLifecycle(
 
   await hre.mbDeployer.link(signer, 'AggyTask', taskAddress, {
     addressLabel: 'aggy_task_' + taskIdShort,
-    contractVersion: '1.4',
+    contractVersion: '1.5',
     contractLabel: 'aggy_task',
   });
 

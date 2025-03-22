@@ -26,6 +26,7 @@ contract AggyTask {
 
         task.data = _taskData;
         task.state.requester = _requester;
+        task.state.updated = block.timestamp;
 
         emit IAggyTask.TaskCreated(address(this), task);
     }
@@ -51,6 +52,7 @@ contract AggyTask {
 
         task.state.status = IAggyTask.TaskStatus.InProgress;
         task.state.contractor = _contractor;
+        task.state.updated = block.timestamp;
 
         emit IAggyTask.TaskClaimed(address(this), task);
     }
@@ -67,6 +69,7 @@ contract AggyTask {
         );
 
         task.state.status = IAggyTask.TaskStatus.UnderReview;
+        task.state.updated = block.timestamp;
 
         emit IAggyTask.TaskCompleted(address(this), task);
     }
@@ -79,6 +82,7 @@ contract AggyTask {
         );
 
         task.state.status = IAggyTask.TaskStatus.Confirmed;
+        task.state.updated = block.timestamp;
 
         // transfer reward + stake amount from this contract to contractor
         require(
@@ -101,6 +105,7 @@ contract AggyTask {
         );
 
         task.state.status = IAggyTask.TaskStatus.Failed;
+        task.state.updated = block.timestamp;
 
         // transfer stake and reward amounts from this contract to the requester
         require(
@@ -127,6 +132,7 @@ contract AggyTask {
         );
 
         task.state.status = IAggyTask.TaskStatus.Cancelled;
+        task.state.updated = block.timestamp;
 
         // split the difference - transfer stake amount back to contractor and reward amount back to the requester
         require(

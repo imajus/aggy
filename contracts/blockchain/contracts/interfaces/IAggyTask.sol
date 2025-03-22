@@ -24,6 +24,7 @@ interface IAggyTask {
         TaskStatus status;
         address contractor;
         address requester;
+        uint256 updated;
     }
 
     struct Task {
