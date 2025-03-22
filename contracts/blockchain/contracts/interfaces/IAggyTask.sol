@@ -39,11 +39,16 @@ interface IAggyTask {
     event TaskFailed(address indexed taskAddress, IAggyTask.Task task);
     event TaskCancelled(address indexed taskAddress, IAggyTask.Task task);
 
+    event TaskAssertionMade(bytes32 assertionId, address indexed task);
+    event TaskAssertionResolved(bytes32 assertionId, bool result);
+
     function getTask() external view returns (Task memory);
 
     function claimTask(address _contractor) external;
 
     function completeTask(address _contractor) external;
+
+    function resolveTask() external;
 
     function confirmTask() external;
 

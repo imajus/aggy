@@ -38,7 +38,7 @@ const config: HardhatUserConfig = {
     apiKey: adminApiKey,
     host: deploymentEndpoint,
     allowUpdateAddress: ['development', 'testing'],
-    allowUpdateContract: ['development'],
+    allowUpdateContract: ['development', 'testing'],
   },
   solidity: {
     compilers: [

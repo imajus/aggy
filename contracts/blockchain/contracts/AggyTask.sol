@@ -3,12 +3,21 @@ pragma solidity ^0.8.29;
 
 import "./interfaces/IAggyToken.sol";
 import "./interfaces/IAggyTask.sol";
+import "./interfaces/OptimisticOracleExtended.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 contract AggyTask {
     address public aggyCore;
     IAggyToken public aggyToken;
 
     IAggyTask.Task public task;
+
+    // UMA parameters
+    OptimisticOracleExtended public oracle;
+    bytes32 public assertionId;
+    bytes32 public umaIdentifier = bytes32("ASSERT_TRUTH"); // applicable to UMA v3
+    uint64 public umaLiveness = 30; // in seconds
+    bytes32 public constant umaDomainId = 0x0;
 
     modifier onlyAggy() {
         require(msg.sender == aggyCore, "AggyTaskFactory: must be Aggy");
@@ -19,6 +28,7 @@ contract AggyTask {
         address _aggyCore,
         address _aggyToken,
         address _requester,
+        address _oracle,
         IAggyTask.TaskData memory _taskData
     ) {
         aggyCore = _aggyCore;
@@ -27,6 +37,8 @@ contract AggyTask {
         task.data = _taskData;
         task.state.requester = _requester;
         task.state.updated = block.timestamp;
+
+        oracle = OptimisticOracleExtended(_oracle);
 
         emit IAggyTask.TaskCreated(address(this), task);
     }
@@ -71,7 +83,94 @@ contract AggyTask {
         task.state.status = IAggyTask.TaskStatus.UnderReview;
         task.state.updated = block.timestamp;
 
+        // request resolution from the UMA optimistic oracle
+        // only if oracle set
+        if (address(oracle) != address(0)) {
+            // construct the claim
+            string memory claim = string(
+                abi.encodePacked(
+                    "The task '",
+                    task.data.name,
+                    "' with ID '",
+                    task.data.id,
+                    "' was completed successfully."
+                )
+            );
+
+            // we can only use the default currency, it appears
+            address defaultCurrency = oracle.defaultCurrency();
+
+            // get the minimum bond required
+            uint256 minBond = oracle.getMinimumBond(address(aggyToken));
+
+            // if the minimum bond >0, attempt to transfer from the contractor to this
+            // contract and then approve the oracle to transfer the bond
+            if (minBond > 0) {
+                require(
+                    aggyToken.transferFrom(_contractor, address(this), minBond),
+                    "AggyTask: failed to transfer bond"
+                );
+
+                aggyToken.approve(address(oracle), minBond);
+            }
+
+            // assert to UMA optimistic oracle
+            assertionId = oracle.assertTruth(
+                bytes(claim),
+                address(this), // asserter
+                address(0), // no callback
+                address(0), // no escalation manager
+                umaLiveness,
+                IERC20(defaultCurrency),
+                minBond,
+                umaIdentifier,
+                umaDomainId
+            );
+
+            emit IAggyTask.TaskAssertionMade(assertionId, address(this));
+        }
+
         emit IAggyTask.TaskCompleted(address(this), task);
+    }
+
+    /// @notice Resolve the task assertion
+    function resolveTask() external onlyAggy {
+        require(
+            task.state.status == IAggyTask.TaskStatus.UnderReview,
+            "AggyTask: task must be UnderReview"
+        );
+
+        require(address(oracle) != address(0), "AggyTask: oracle not set");
+
+        bool result = oracle.settleAndGetAssertionResult(assertionId);
+
+        if (result) {
+            task.state.status = IAggyTask.TaskStatus.Confirmed;
+            task.state.updated = block.timestamp;
+
+            require(
+                aggyToken.transfer(
+                    task.state.contractor,
+                    task.data.stakeAmount + task.data.rewardAmount
+                ),
+                "AggyTask: failed to transfer reward"
+            );
+
+            emit IAggyTask.TaskConfirmed(address(this), task);
+        } else {
+            task.state.status = IAggyTask.TaskStatus.Failed;
+            task.state.updated = block.timestamp;
+
+            require(
+                aggyToken.transfer(
+                    task.state.requester,
+                    task.data.stakeAmount + task.data.rewardAmount
+                ),
+                "AggyTask: failed to return funds"
+            );
+
+            emit IAggyTask.TaskFailed(address(this), task);
+        }
     }
 
     /// @notice Confirm the task and transfer the reward amount to the contractor

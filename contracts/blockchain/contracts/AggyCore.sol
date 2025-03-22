@@ -19,6 +19,8 @@ contract AggyCore is AccessControl {
     string public constraintsPreamble = "I must adhere to these constraints:";
     string[] public constraints;
 
+    address public optimisticOracle;
+
     event SafetyRuleAdded(uint256 index, string safetyRule);
     event SafetyRuleSet(uint256 index, string safetyRule);
     event SafetyRuleDeleted(uint256 index);
@@ -31,7 +33,8 @@ contract AggyCore is AccessControl {
         string[] memory _safetyRules,
         string[] memory _constraints,
         IAggyTaskFactory _taskFactory,
-        IAggyToken _aggyToken
+        IAggyToken _aggyToken,
+        address _optimisticOracle
     ) {
         _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
         _grantRole(VERIFIER_ROLE, msg.sender); // for debugging, remove later
@@ -48,6 +51,17 @@ contract AggyCore is AccessControl {
 
         taskFactory = _taskFactory;
         aggyToken = _aggyToken;
+        optimisticOracle = _optimisticOracle;
+    }
+
+    // Uma ---------------------------------------------------------------------
+
+    /// @notice Set the optimistic oracle address
+    /// @param _optimisticOracle The optimistic oracle address
+    function setOptimisticOracle(
+        address _optimisticOracle
+    ) external onlyRole(DEFAULT_ADMIN_ROLE) {
+        optimisticOracle = _optimisticOracle;
     }
 
     // Tasks -------------------------------------------------------------------
@@ -59,6 +73,7 @@ contract AggyCore is AccessControl {
         address task = taskFactory.createTask(
             address(aggyToken),
             msg.sender,
+            optimisticOracle,
             _taskData
         );
 
@@ -94,6 +109,13 @@ contract AggyCore is AccessControl {
     function completeTask(string memory taskId) external {
         address taskAddress = taskFactory.getTaskAddressById(taskId);
         IAggyTask(taskAddress).completeTask(msg.sender);
+    }
+
+    /// @notice Resolve a task by ID
+    /// @param taskId The task ID
+    function resolveTask(string memory taskId) external {
+        address taskAddress = taskFactory.getTaskAddressById(taskId);
+        IAggyTask(taskAddress).resolveTask();
     }
 
     /// @notice Confirm a task by ID

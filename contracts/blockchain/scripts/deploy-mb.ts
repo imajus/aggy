@@ -77,7 +77,7 @@ async function runTaskLifecycle(
 
   await hre.mbDeployer.link(signer, 'AggyTask', taskAddress, {
     addressLabel: 'aggy_task_' + taskIdShort,
-    contractVersion: '1.5',
+    contractVersion: '1.7',
     contractLabel: 'aggy_task',
   });
 
@@ -113,6 +113,8 @@ async function main() {
   ];
   const adminRole = '0x0000000000000000000000000000000000000000000000000000000000000000';
   const verifierRole = '0x0ce23c3e399818cfee81a7ab0880f714e53d7672b08df0fa62f2843416e1ea09';
+
+  const optimisticOracleAddress = '0xFd9e2642a170aDD10F53Ee14a93FcF2F31924944';
 
   // AggyToken ----------------------------------------------------------------
 
@@ -161,7 +163,7 @@ async function main() {
   const aggyCoreResult = await hre.mbDeployer.deploy(
     signer,
     'AggyCore',
-    [goal, safetyRules, constraints, aggyTaskFactoryAddress, aggyTokenAddress],
+    [goal, safetyRules, constraints, aggyTaskFactoryAddress, aggyTokenAddress, optimisticOracleAddress],
     {
       addressLabel: 'aggy_core',
       contractVersion: '1.0',
@@ -210,7 +212,7 @@ async function main() {
   // Setup and run task lifecycle checks --------------------------------------
 
   const longDeadline = Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 7; // 1 week from now
-  const pastDeadline = Math.floor(Date.now() / 1000) - 60 * 60 * 24 * 7; // 1 week ago
+  // const pastDeadline = Math.floor(Date.now() / 1000) - 60 * 60 * 24 * 7; // 1 week ago
 
   const taskSuccess: IAggyTask.TaskDataStruct = {
     name: 'Raise capital',
@@ -221,22 +223,22 @@ async function main() {
     deadline: longDeadline,
   };
 
-  const taskFail: IAggyTask.TaskDataStruct = {
-    name: 'Build a research center',
-    id: 'a7b8f342-4e99-4c29-b8e0-1a2a8b799f0c',
-    details: 'Interview potential construction firms.',
-    rewardAmount: 300,
-    stakeAmount: 400,
-    deadline: pastDeadline,
-  };
-  const taskCancel: IAggyTask.TaskDataStruct = {
-    name: 'Rally supporters',
-    id: '1c3d5ea1-9f6b-4a61-a4c2-bf2d67864e75',
-    details: 'Start a social media account and post once a week.',
-    rewardAmount: 50,
-    stakeAmount: 600,
-    deadline: longDeadline,
-  };
+  // const taskFail: IAggyTask.TaskDataStruct = {
+  //   name: 'Build a research center',
+  //   id: 'a7b8f342-4e99-4c29-b8e0-1a2a8b799f0c',
+  //   details: 'Interview potential construction firms.',
+  //   rewardAmount: 300,
+  //   stakeAmount: 400,
+  //   deadline: pastDeadline,
+  // };
+  // const taskCancel: IAggyTask.TaskDataStruct = {
+  //   name: 'Rally supporters',
+  //   id: '1c3d5ea1-9f6b-4a61-a4c2-bf2d67864e75',
+  //   details: 'Start a social media account and post once a week.',
+  //   rewardAmount: 50,
+  //   stakeAmount: 600,
+  //   deadline: longDeadline,
+  // };
 
   await runTaskLifecycle(taskSuccess, 'Happy', aggyCore, aggyTaskFactory, aggyToken, signer, async (taskId) => {
     console.log('Complete work on the task');
@@ -244,19 +246,19 @@ async function main() {
 
     await sleep();
 
-    console.log('Confirm the task');
-    await aggyCore.confirmTask(taskId);
+    // console.log('Confirm the task');
+    // await aggyCore.confirmTask(taskId);
   });
 
-  await runTaskLifecycle(taskFail, 'Fail', aggyCore, aggyTaskFactory, aggyToken, signer, async (taskId) => {
-    console.log('Fail the task');
-    await aggyCore.failTask(taskId);
-  });
+  // await runTaskLifecycle(taskFail, 'Fail', aggyCore, aggyTaskFactory, aggyToken, signer, async (taskId) => {
+  //   console.log('Fail the task');
+  //   await aggyCore.failTask(taskId);
+  // });
 
-  await runTaskLifecycle(taskCancel, 'Cancel', aggyCore, aggyTaskFactory, aggyToken, signer, async (taskId) => {
-    console.log('Cancel the task');
-    await aggyCore.cancelTask(taskId);
-  });
+  // await runTaskLifecycle(taskCancel, 'Cancel', aggyCore, aggyTaskFactory, aggyToken, signer, async (taskId) => {
+  //   console.log('Cancel the task');
+  //   await aggyCore.cancelTask(taskId);
+  // });
 }
 
 // We recommend this pattern to be able to use async/await everywhere

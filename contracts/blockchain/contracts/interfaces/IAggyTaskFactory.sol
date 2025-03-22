@@ -7,6 +7,7 @@ interface IAggyTaskFactory {
     function createTask(
         address _aggyToken,
         address _requester,
+        address _optimisticOracle,
         IAggyTask.TaskData memory _taskData
     ) external returns (address);
 
