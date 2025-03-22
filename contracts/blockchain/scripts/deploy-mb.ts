@@ -12,7 +12,7 @@ import {
 } from '../typechain-types';
 import { Signer } from 'ethers';
 
-function taskToTuple(task: IAggyTask.TaskStruct): string {
+function taskDataToTuple(task: IAggyTask.TaskDataStruct): string {
   const tuple = [
     task.name,
     task.id,
@@ -29,7 +29,7 @@ function taskToTuple(task: IAggyTask.TaskStruct): string {
 }
 
 async function runTaskLifecycle(
-  taskInput: IAggyTask.TaskStruct,
+  taskInput: IAggyTask.TaskDataStruct,
   actionLabel: string,
   aggyCore: AggyCore,
   aggyTaskFactory: AggyTaskFactory,
@@ -39,7 +39,7 @@ async function runTaskLifecycle(
 ) {
   console.log(`\n\n=== ${actionLabel} path lifecycle check ===`);
 
-  console.log(`Task tuple: ${taskToTuple(taskInput)}`);
+  console.log(`Task tuple: ${taskDataToTuple(taskInput)}`);
 
   await aggyCore.createTask(taskInput);
   console.log('Task created');
@@ -53,7 +53,7 @@ async function runTaskLifecycle(
 
   await hre.mbDeployer.link(signer, 'AggyTask', taskAddress, {
     addressLabel: 'aggy_task_' + taskIdShort,
-    contractVersion: '1.2',
+    contractVersion: '1.3',
     contractLabel: 'aggy_task',
   });
 
@@ -170,7 +170,7 @@ async function main() {
   const longDeadline = Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 7; // 1 week from now
   const pastDeadline = Math.floor(Date.now() / 1000) - 60 * 60 * 24 * 7; // 1 week ago
 
-  const taskSuccess: IAggyTask.TaskStruct = {
+  const taskSuccess: IAggyTask.TaskDataStruct = {
     name: 'Raise capital',
     id: '3f8c2c74-2a0f-4f1c-bbe7-118fdacfa4a6',
     details: 'Reach out to 10 VCs and offer to sell them 100,000 tokens in exchange for 1% of the tokens.',
@@ -179,7 +179,7 @@ async function main() {
     deadline: longDeadline,
   };
 
-  const taskFail: IAggyTask.TaskStruct = {
+  const taskFail: IAggyTask.TaskDataStruct = {
     name: 'Build a research center',
     id: 'a7b8f342-4e99-4c29-b8e0-1a2a8b799f0c',
     details: 'Interview potential construction firms.',
@@ -187,7 +187,7 @@ async function main() {
     stakeAmount: 400,
     deadline: pastDeadline,
   };
-  const taskCancel: IAggyTask.TaskStruct = {
+  const taskCancel: IAggyTask.TaskDataStruct = {
     name: 'Rally supporters',
     id: '1c3d5ea1-9f6b-4a61-a4c2-bf2d67864e75',
     details: 'Start a social media account and post once a week.',
