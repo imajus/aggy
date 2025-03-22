@@ -1,0 +1,153 @@
+{
+  "createdAt": "2025-03-21T16:21:22.953Z",
+  "updatedAt": "2025-03-22T07:25:22.000Z",
+  "id": "QBI6a9zMRJaErfqI",
+  "name": "Nillion SecretVault: Insert Task data",
+  "active": false,
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "taskId"
+            },
+            {
+              "name": "data"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -1780,
+        320
+      ],
+      "id": "073ab02d-7aba-4d6c-bb4a-e8066cba7d43",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -2220,
+        80
+      ],
+      "id": "0b382162-47d8-4406-9a68-2c29fa19a77a",
+      "name": "When clicking ‘Test workflow’"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "3b371e5b-c668-4abc-b6db-c668e7a89940",
+              "name": "data",
+              "value": "Ut dignissimos tempora voluptatibus. Ut labore harum quae sed et eveniet eius. Natus saepe debitis rerum.",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -2000,
+        80
+      ],
+      "id": "fc44cef8-0c1d-496c-be67-9b964b21c3d7",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "action": "generate",
+        "dataPropertyName": "taskId"
+      },
+      "type": "n8n-nodes-base.crypto",
+      "typeVersion": 1,
+      "position": [
+        -1780,
+        80
+      ],
+      "id": "c27c8d96-6cac-4d8f-a0e2-10ff6960fe0c",
+      "name": "Crypto"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const { SecretVaultWrapper } = require('secretvaults');\n\nconst nodes = [\n  {\n    url: 'https://nildb-nx8v.nillion.network',\n    did: 'did:nil:testnet:nillion1qfrl8nje3nvwh6cryj63mz2y6gsdptvn07nx8v',\n  },\n  {\n    url: 'https://nildb-p3mx.nillion.network',\n    did: 'did:nil:testnet:nillion1uak7fgsp69kzfhdd6lfqv69fnzh3lprg2mp3mx',\n  },\n  {\n    url: 'https://nildb-rugk.nillion.network',\n    did: 'did:nil:testnet:nillion1kfremrp2mryxrynx66etjl8s7wazxc3rssrugk',\n  },\n];\n\nconsole.log('NILLION_ORG_DID:', $env.NILLION_ORG_DID);\nconsole.log('NILLION_ORG_SECRET_KEY:', $env.NILLION_ORG_SECRET_KEY);\nconsole.log('NILLION_VAULT_SCHEMA_ID:', $env.NILLION_VAULT_SCHEMA_ID);\n\nconst collection = new SecretVaultWrapper(\n  nodes,\n  {\n    secretKey: $env.NILLION_ORG_SECRET_KEY,\n    orgDid: $env.NILLION_ORG_DID,\n  },\n  $env.NILLION_VAULT_SCHEMA_ID\n);\nawait collection.init();\n\nconst result = await collection.writeToNodes([{\n  _id: $input.item.json.taskId,\n  data: { '%allot': $input.item.json.data },\n}]);\n\nreturn { json: { result } };"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1520,
+        200
+      ],
+      "id": "0b39c090-b47f-4b02-a6f5-c8a9756ca03d",
+      "name": "Add record"
+    }
+  ],
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Add record",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Test workflow’": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Crypto",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Crypto": {
+      "main": [
+        [
+          {
+            "node": "Add record",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add record": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "85c39c3c-9f61-4daf-818e-271396152900",
+  "triggerCount": 0,
+  "tags": []
+}

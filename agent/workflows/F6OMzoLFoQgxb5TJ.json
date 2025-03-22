@@ -1,0 +1,73 @@
+{
+  "createdAt": "2025-03-21T14:32:53.505Z",
+  "updatedAt": "2025-03-21T16:21:40.000Z",
+  "id": "F6OMzoLFoQgxb5TJ",
+  "name": "Privy test",
+  "active": false,
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "40e8361e-447f-4ef6-a276-81d76dc6a646",
+      "name": "When clicking ‘Test workflow’"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "privy-app-id",
+              "value": "cm8iv5dsn02gbv2k7mgysv4wi"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        220,
+        0
+      ],
+      "id": "1efddf0f-11fe-485e-947b-4fd69417938d",
+      "name": "HTTP Request",
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "My1tBeOB2YcD5gFY",
+          "name": "Privy credential"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "When clicking ‘Test workflow’": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "babc7208-5600-4d14-aaf7-5e07ccfc1615",
+  "triggerCount": 0,
+  "tags": []
+}

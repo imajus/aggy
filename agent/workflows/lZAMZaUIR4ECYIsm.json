@@ -1,0 +1,60 @@
+{
+  "createdAt": "2025-03-21T19:30:24.260Z",
+  "updatedAt": "2025-03-22T07:13:53.000Z",
+  "id": "lZAMZaUIR4ECYIsm",
+  "name": "Nillion SecretVault: Create schema",
+  "active": false,
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -2000,
+        280
+      ],
+      "id": "1a544a6b-6bb1-45d4-9089-a16913636c55",
+      "name": "When clicking ‘Test workflow’"
+    },
+    {
+      "parameters": {
+        "jsCode": "const { SecretVaultWrapper } = require('secretvaults');\n\nconst nodes = [\n  {\n    url: 'https://nildb-nx8v.nillion.network',\n    did: 'did:nil:testnet:nillion1qfrl8nje3nvwh6cryj63mz2y6gsdptvn07nx8v',\n  },\n  {\n    url: 'https://nildb-p3mx.nillion.network',\n    did: 'did:nil:testnet:nillion1uak7fgsp69kzfhdd6lfqv69fnzh3lprg2mp3mx',\n  },\n  {\n    url: 'https://nildb-rugk.nillion.network',\n    did: 'did:nil:testnet:nillion1kfremrp2mryxrynx66etjl8s7wazxc3rssrugk',\n  },\n];\n\nconsole.log('NILLION_ORG_DID:', $env.NILLION_ORG_DID);\nconsole.log('NILLION_ORG_SECRET_KEY:', $env.NILLION_ORG_SECRET_KEY);\n\nconst collection = new SecretVaultWrapper(\n  nodes,\n  {\n    secretKey: $env.NILLION_ORG_SECRET_KEY,\n    orgDid: $env.NILLION_ORG_DID,\n  },\n  $env.NILLION_VAULT_SCHEMA_ID\n);\nawait collection.init();\n\nconst newSchema = await collection.createSchema(\n  {\n    \"$schema\": \"http://json-schema.org/draft-07/schema#\",\n    \"title\": \"TasksPrivateData\",\n    \"type\": \"array\",\n    \"items\": {\n      \"type\": \"object\",\n      \"properties\": {\n        \"_id\": {\n          \"type\": \"string\",\n          \"format\": \"uuid\",\n          \"coerce\": true\n        },\n        \"data\": {\n          \"type\": \"object\",\n          \"properties\": {\n            \"%share\": {\n              \"type\": \"string\"\n            }\n          },\n          \"required\": [\n            \"%share\"\n          ]\n        }\n      },\n      \"required\": [\n        \"_id\",\n        \"data\"\n      ]\n    }\n  },\n  'TasksPrivateData'\n);\nconsole.log('📚 New Schema:', newSchema);\n\nreturn newSchema.map(data => ({ json: data }));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1780,
+        280
+      ],
+      "id": "ba1b0895-fca0-4172-8926-f9aac8e2c2f6",
+      "name": "Create a schema"
+    }
+  ],
+  "connections": {
+    "When clicking ‘Test workflow’": {
+      "main": [
+        [
+          {
+            "node": "Create a schema",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create a schema": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "4c09fdd3-6985-4f4f-bffe-3a72bbd3f800",
+  "triggerCount": 0,
+  "tags": []
+}
