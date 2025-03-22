@@ -10,6 +10,16 @@ import {
 } from '../typechain-types';
 import { Signer } from 'ethers';
 
+const doSleep = true;
+const sleepTime = 3000;
+
+async function sleep() {
+  if (!doSleep) {
+    return;
+  }
+  await new Promise((resolve) => setTimeout(resolve, sleepTime));
+}
+
 function taskDataToTuple(task: IAggyTask.TaskDataStruct): string {
   const tuple = [
     task.name,
@@ -44,17 +54,21 @@ async function runTaskLifecycle(
   // in a real-world scenario
 
   console.log('Getting some tokens in order to incentivize a reward to the task');
-  await aggyCore.transferTokens(signer, taskInput.rewardAmount);
+  await (await aggyCore.transferTokens(signer, taskInput.rewardAmount)).wait();
+
+  await sleep();
 
   console.log('Approving reward tokens to Aggy Core');
-  await aggyToken.approve(aggyCoreAddress, taskInput.rewardAmount);
+  await (await aggyToken.approve(aggyCoreAddress, taskInput.rewardAmount)).wait();
+
+  await sleep();
 
   console.log(`Task tuple: ${taskDataToTuple(taskInput)}`);
 
-  await aggyCore.createTask(taskInput);
+  await (await aggyCore.createTask(taskInput)).wait();
   console.log('Task created');
 
-  await new Promise((resolve) => setTimeout(resolve, 2000));
+  await sleep();
 
   const taskAddress = await aggyTaskFactory.getTaskAddressById(taskInput.id);
   console.log(`Task address: ${taskAddress}`);
@@ -68,15 +82,23 @@ async function runTaskLifecycle(
   });
 
   console.log('Getting some tokens in order to stake to the task');
-  await aggyCore.transferTokens(signer, taskInput.stakeAmount);
+  await (await aggyCore.transferTokens(signer, taskInput.stakeAmount)).wait();
+
+  await sleep();
 
   console.log('Approving stake tokens to Aggy Core');
-  await aggyToken.approve(aggyCoreAddress, taskInput.stakeAmount);
+  await (await aggyToken.approve(aggyCoreAddress, taskInput.stakeAmount)).wait();
+
+  await sleep();
 
   console.log('Starting to work on the task');
-  await aggyCore.claimTask(taskInput.id);
+  await (await aggyCore.claimTask(taskInput.id)).wait();
+
+  await sleep();
 
   await finalAction(taskInput.id);
+
+  await sleep();
 }
 
 async function main() {
@@ -100,6 +122,8 @@ async function main() {
     contractLabel: 'aggy_token',
   });
 
+  await sleep();
+
   const aggyTokenAddress = await aggyTokenResult.contract.getAddress();
 
   console.log(`AggyToken deployed to ${aggyTokenAddress}`);
@@ -111,6 +135,8 @@ async function main() {
     contractVersion: '1.0',
     contractLabel: 'aggy_task_factory',
   });
+
+  await sleep();
 
   const aggyTaskFactoryAddress = await aggyTaskFactoryResult.contract.getAddress();
 
@@ -143,6 +169,8 @@ async function main() {
     },
   );
 
+  await sleep();
+
   const aggyCoreAddress = await aggyCoreResult.contract.getAddress();
 
   console.log(`AggyCore deployed to ${aggyCoreAddress}`);
@@ -151,20 +179,26 @@ async function main() {
 
   const aggyTaskFactory = AggyTaskFactory__factory.connect(aggyTaskFactoryAddress, signer);
 
-  await aggyTaskFactory.setAggyCore(aggyCoreAddress);
+  await (await aggyTaskFactory.setAggyCore(aggyCoreAddress)).wait();
+
+  await sleep();
 
   const aggyToken = AggyToken__factory.connect(aggyTokenAddress, signer);
 
-  await aggyToken.initialize(aggyCoreAddress);
+  await (await aggyToken.initialize(aggyCoreAddress)).wait();
+
+  await sleep();
 
   const aggyCore = AggyCore__factory.connect(aggyCoreAddress, signer);
 
   // add admin role for all admin accounts
   for (const adminAccount of adminAccounts) {
-    await aggyCore.grantRole(adminRole, adminAccount);
-    await aggyCore.grantRole(verifierRole, adminAccount);
-    await aggyTaskFactory.grantRole(adminRole, adminAccount);
+    await (await aggyCore.grantRole(adminRole, adminAccount)).wait();
+    await (await aggyCore.grantRole(verifierRole, adminAccount)).wait();
+    await (await aggyTaskFactory.grantRole(adminRole, adminAccount)).wait();
   }
+
+  await sleep();
 
   console.log('Aggy setup complete');
 
