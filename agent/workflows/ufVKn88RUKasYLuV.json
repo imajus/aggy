@@ -1,24 +1,10 @@
 {
   "createdAt": "2025-03-22T09:27:27.254Z",
-  "updatedAt": "2025-03-22T10:00:43.000Z",
+  "updatedAt": "2025-03-22T12:42:45.000Z",
   "id": "ufVKn88RUKasYLuV",
-  "name": "MultiBaaS: Send transaction",
+  "name": "Privy: Send transaction",
   "active": false,
   "nodes": [
-    {
-      "parameters": {
-        "mode": "runOnceForEachItem",
-        "jsCode": "const ethers = require('ethers');\n\nconsole.log('AGGY_WALLET_ADDRESS', $env.AGGY_WALLET_ADDRESS);\nconsole.log('AGGY_WALLET_PRIVATE_KEY', $env.AGGY_WALLET_PRIVATE_KEY);\n\nconst { to, data, value, nonce, gasLimit, maxFeePerGas, maxPriorityFeePerGas, type } = $input.item.json;\nconst wallet = new ethers.Wallet($env.AGGY_WALLET_PRIVATE_KEY);\nconst signed = await wallet.signTransaction({\n  from: $env.AGGY_WALLET_ADDRESS,\n  chainId: $env.MULTIBAAS_CHAIN_ID,\n  to,\n  data,\n  value,\n  gasLimit,\n  type,\n  nonce,\n  maxFeePerGas,\n  maxPriorityFeePerGas,\n});\n\nreturn { json: { signed } };"
-      },
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        440,
-        -120
-      ],
-      "id": "f616bfa7-d160-4f3f-a11b-c405ef7fac9e",
-      "name": "Sign transaction"
-    },
     {
       "parameters": {
         "method": "POST",
@@ -39,7 +25,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        660,
+        880,
         -120
       ],
       "id": "790d9231-e931-4e5b-b994-330602681de1",
@@ -49,12 +35,16 @@
           "id": "Kcme09pJN7p2gcFw",
           "name": "MultiBaaS account"
         }
-      }
+      },
+      "disabled": true
     },
     {
       "parameters": {
         "workflowInputs": {
           "values": [
+            {
+              "name": "walletId"
+            },
             {
               "name": "to"
             },
@@ -90,34 +80,83 @@
       "type": "n8n-nodes-base.executeWorkflowTrigger",
       "typeVersion": 1.1,
       "position": [
-        220,
+        440,
         -120
       ],
       "id": "a082c46b-b273-421d-bd8b-25d3a1db9c6f",
       "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const ethers = require('ethers');\n\nconst { from, to, data, value, nonce, gasLimit, maxFeePerGas, maxPriorityFeePerGas, type } = $input.item.json;\nconst wallet = new ethers.Wallet($env.AGGY_WALLET_PRIVATE_KEY);\nconst signed = await wallet.signTransaction({\n  chainId: $env.MULTIBAAS_CHAIN_ID,\n  from,\n  to,\n  data,\n  value,\n  gasLimit,\n  type,\n  nonce,\n  maxFeePerGas,\n  maxPriorityFeePerGas,\n});\n\nreturn { json: { signed } };"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        880,
+        -340
+      ],
+      "id": "f616bfa7-d160-4f3f-a11b-c405ef7fac9e",
+      "name": "Sign transaction with ethers",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://api.privy.io/v1/wallets/{{ $json.walletId }}/rpc",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "privy-app-id",
+              "value": "={{ $env.PRIVY_APP_ID }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{JSON.stringify({\n  //method: 'eth_signTransaction',\n  method: 'eth_sendTransaction',\n  caip2: `eip155:${$env.MULTIBAAS_CHAIN_ID}`,\n  chain_type: 'ethereum',\n  params: {\n    transaction: {\n      to: $json.to,\n      value: $json.value,\n      chain_id: $env.MULTIBAAS_CHAIN_ID,\n      data: $json.data,\n      gas: $json.gasLimit,\n      nonce: $json.nonce,\n      max_fee_per_gas: $json.maxFeePerGas,\n      max_priority_fee_per_gas: $json.maxPriorityFeePerGas,\n    }\n  }\n})}}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        660,
+        -120
+      ],
+      "id": "0a4af439-f110-4f56-a729-1653ed6ca174",
+      "name": "Send transaction with Privy",
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "My1tBeOB2YcD5gFY",
+          "name": "Privy credential"
+        }
+      }
     }
   ],
   "connections": {
-    "Sign transaction": {
+    "When Executed by Another Workflow": {
       "main": [
         [
           {
-            "node": "Send transaction",
+            "node": "Send transaction with Privy",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "When Executed by Another Workflow": {
+    "Sign transaction with ethers": {
       "main": [
-        [
-          {
-            "node": "Sign transaction",
-            "type": "main",
-            "index": 0
-          }
-        ]
+        []
+      ]
+    },
+    "Send transaction with Privy": {
+      "main": [
+        []
       ]
     }
   },
@@ -127,7 +166,7 @@
   "staticData": null,
   "meta": null,
   "pinData": {},
-  "versionId": "eb73abea-0b19-412d-a6c9-292796d24a66",
+  "versionId": "5bc952b9-73de-49d7-b069-4dfeeeb9b0ae",
   "triggerCount": 0,
   "tags": []
 }

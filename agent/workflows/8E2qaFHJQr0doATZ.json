@@ -1,6 +1,6 @@
 {
   "createdAt": "2025-03-22T07:28:23.524Z",
-  "updatedAt": "2025-03-22T10:04:51.000Z",
+  "updatedAt": "2025-03-22T12:50:57.000Z",
   "id": "8E2qaFHJQr0doATZ",
   "name": "MultiBaaS: Create Task",
   "active": false,
@@ -10,58 +10,12 @@
       "type": "n8n-nodes-base.manualTrigger",
       "typeVersion": 1,
       "position": [
-        -20,
-        -220
+        -260,
+        180
       ],
       "id": "be048520-449c-4cfd-9a45-8cf9b525c7ee",
-      "name": "When clicking ‘Test workflow’"
-    },
-    {
-      "parameters": {
-        "assignments": {
-          "assignments": [
-            {
-              "id": "2b4d7d83-6238-4d7b-823e-755eb8b80685",
-              "name": "name",
-              "value": "=Test {{ Date.now() }}",
-              "type": "string"
-            },
-            {
-              "id": "db6a19b7-0b4a-4521-9ace-7ecc95d58a34",
-              "name": "details",
-              "value": "Adipisci eveniet voluptatem sed. Molestias nemo odio dicta corporis corrupti iusto optio. Voluptas vero repellendus aut qui vel asperiores nihil. Aut non ut autem magni dolores voluptatum consequatur sunt.  Ipsam dignissimos necessitatibus id cum. Autem quaerat occaecati impedit. Sequi explicabo doloremque corporis et enim et. Id voluptatem fugit reprehenderit et ut quasi dolore. Aliquid itaque et impedit.  Doloribus natus ad architecto sapiente dignissimos et. Voluptas beatae minima quae. Dicta dolorem ex laborum eius vitae at quam.  Sapiente ducimus ut voluptatem eos cumque ab. Qui exercitationem quia ducimus tempore perspiciatis autem aut. Sed ea id architecto voluptas esse sunt. Numquam consequatur non et suscipit quibusdam autem. Totam eaque molestiae laboriosam explicabo quibusdam quas fuga. Et nobis qui ut.  Deserunt sed maiores vel. Repudiandae ut magnam eius voluptates culpa sunt. Quia ad iusto qui deleniti. Magni qui doloremque ducimus. Perferendis nam consequuntur amet ratione. Vel error aut amet necessitatibus animi est natus.",
-              "type": "string"
-            },
-            {
-              "id": "defd2c1e-eca0-4542-bee2-cb88ebb302be",
-              "name": "reward",
-              "value": 1000,
-              "type": "number"
-            },
-            {
-              "id": "7ff9a906-084d-4114-aefb-dd1b004d0b9e",
-              "name": "penalty",
-              "value": 2000,
-              "type": "number"
-            },
-            {
-              "id": "3bf4dec3-cd8d-4901-bade-4841ed832de5",
-              "name": "deadline",
-              "value": "={{ Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 7 }}",
-              "type": "number"
-            }
-          ]
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.set",
-      "typeVersion": 3.4,
-      "position": [
-        200,
-        -220
-      ],
-      "id": "e0eef28e-8083-4f5e-bd4f-b95b5407ed8b",
-      "name": "Fake Task data"
+      "name": "When clicking ‘Test workflow’",
+      "disabled": true
     },
     {
       "parameters": {
@@ -71,8 +25,8 @@
       "type": "n8n-nodes-base.crypto",
       "typeVersion": 1,
       "position": [
-        440,
-        0
+        880,
+        175
       ],
       "id": "e8f4814b-216a-4b15-9493-6692654020ab",
       "name": "Generate ID"
@@ -92,7 +46,7 @@
             },
             {
               "name": "from",
-              "value": "0x0A2374C6659bd9dC9a2ECB13cb83C847dc4547D9"
+              "value": "={{ $json.address }}"
             }
           ]
         },
@@ -101,8 +55,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        660,
-        0
+        1100,
+        175
       ],
       "id": "c5657715-9f79-4cf2-9af2-dcea84676f1d",
       "name": "Prepare transaction",
@@ -117,6 +71,9 @@
       "parameters": {
         "workflowInputs": {
           "values": [
+            {
+              "name": "userId"
+            },
             {
               "name": "name"
             },
@@ -141,8 +98,8 @@
       "type": "n8n-nodes-base.executeWorkflowTrigger",
       "typeVersion": 1.1,
       "position": [
-        200,
-        0
+        220,
+        175
       ],
       "id": "c7b1bb36-0ed4-417e-a350-292478779be0",
       "name": "When Executed by Another Workflow"
@@ -165,10 +122,21 @@
             "nonce": "={{ $json.result.tx.nonce ?? 0 }}",
             "maxPriorityFeePerGas": "={{ $json.result.tx.gasTipCap }}",
             "maxFeePerGas": "={{ $json.result.tx.gasFeeCap }}",
-            "gasLimit": "={{ $json.result.tx.gas }}"
+            "gasLimit": "={{ $json.result.tx.gas }}",
+            "walletId": "={{ $('Generate ID').item.json.walletId }}"
           },
           "matchingColumns": [],
           "schema": [
+            {
+              "id": "walletId",
+              "displayName": "walletId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
             {
               "id": "to",
               "displayName": "to",
@@ -255,11 +223,162 @@
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1.2,
       "position": [
-        880,
-        0
+        1320,
+        175
       ],
       "id": "ceca6895-c79a-4d7d-acc3-099abcda5c2d",
       "name": "Send transaction"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "8E2qaFHJQr0doATZ",
+          "mode": "list",
+          "cachedResultName": "MultiBaaS: Create Task"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "userId": "cm8k5dhme02njjm4wwsfruvx9",
+            "reward": 200,
+            "penalty": 500,
+            "name": "=Test {{ Date.now() }}",
+            "details": "Adipisci eveniet voluptatem sed. Molestias nemo odio dicta corporis corrupti iusto optio. Voluptas vero repellendus aut qui vel asperiores nihil. Aut non ut autem magni dolores voluptatum consequatur sunt.  Ipsam dignissimos necessitatibus id cum. Autem quaerat occaecati impedit. Sequi explicabo doloremque corporis et enim et. Id voluptatem fugit reprehenderit et ut quasi dolore. Aliquid itaque et impedit.  Doloribus natus ad architecto sapiente dignissimos et. Voluptas beatae minima quae. Dicta dolorem ex laborum eius vitae at quam.  Sapiente ducimus ut voluptatem eos cumque ab. Qui exercitationem quia ducimus tempore perspiciatis autem aut. Sed ea id architecto voluptas esse sunt. Numquam consequatur non et suscipit quibusdam autem. Totam eaque molestiae laboriosam explicabo quibusdam quas fuga. Et nobis qui ut.  Deserunt sed maiores vel. Repudiandae ut magnam eius voluptates culpa sunt. Quia ad iusto qui deleniti. Magni qui doloremque ducimus. Perferendis nam consequuntur amet ratione. Vel error aut amet necessitatibus animi est natus.",
+            "deadline": "={{ Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 7 }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "userId",
+              "displayName": "userId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "name",
+              "displayName": "name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "details",
+              "displayName": "details",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "reward",
+              "displayName": "reward",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "number"
+            },
+            {
+              "id": "penalty",
+              "displayName": "penalty",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "number"
+            },
+            {
+              "id": "deadline",
+              "displayName": "deadline",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "number"
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        -40,
+        180
+      ],
+      "id": "019aa056-71bc-4cf3-bb2a-16ce56dec5ce",
+      "name": "Execute Workflow1"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "F6OMzoLFoQgxb5TJ",
+          "mode": "list",
+          "cachedResultName": "Privy: Get user wallet data"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "userId": "={{ $json.userId }}"
+          },
+          "matchingColumns": [
+            "userId"
+          ],
+          "schema": [
+            {
+              "id": "userId",
+              "displayName": "userId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "mode": "each",
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        440,
+        40
+      ],
+      "id": "0c002a42-71ee-40db-8c62-069b60320476",
+      "name": "Get privy wallet data"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [
+        660,
+        175
+      ],
+      "id": "fb5620c1-e384-4864-bad0-09cd11c10f63",
+      "name": "Merge"
     }
   ],
   "connections": {
@@ -267,18 +386,7 @@
       "main": [
         [
           {
-            "node": "Fake Task data",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Fake Task data": {
-      "main": [
-        [
-          {
-            "node": "Generate ID",
+            "node": "Execute Workflow1",
             "type": "main",
             "index": 0
           }
@@ -311,6 +419,33 @@
       "main": [
         [
           {
+            "node": "Get privy wallet data",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Get privy wallet data": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
             "node": "Generate ID",
             "type": "main",
             "index": 0
@@ -324,8 +459,30 @@
   },
   "staticData": null,
   "meta": null,
-  "pinData": {},
-  "versionId": "611b423a-5b33-4077-99cc-f180485f568d",
+  "pinData": {
+    "When Executed by Another Workflow": [
+      {
+        "json": {
+          "userId": "cm8k5dhme02njjm4wwsfruvx9",
+          "name": "Test 1742647546585",
+          "details": "Adipisci eveniet voluptatem sed. Molestias nemo odio dicta corporis corrupti iusto optio. Voluptas vero repellendus aut qui vel asperiores nihil. Aut non ut autem magni dolores voluptatum consequatur sunt.  Ipsam dignissimos necessitatibus id cum. Autem quaerat occaecati impedit. Sequi explicabo doloremque corporis et enim et. Id voluptatem fugit reprehenderit et ut quasi dolore. Aliquid itaque et impedit.  Doloribus natus ad architecto sapiente dignissimos et. Voluptas beatae minima quae. Dicta dolorem ex laborum eius vitae at quam.  Sapiente ducimus ut voluptatem eos cumque ab. Qui exercitationem quia ducimus tempore perspiciatis autem aut. Sed ea id architecto voluptas esse sunt. Numquam consequatur non et suscipit quibusdam autem. Totam eaque molestiae laboriosam explicabo quibusdam quas fuga. Et nobis qui ut.  Deserunt sed maiores vel. Repudiandae ut magnam eius voluptates culpa sunt. Quia ad iusto qui deleniti. Magni qui doloremque ducimus. Perferendis nam consequuntur amet ratione. Vel error aut amet necessitatibus animi est natus.",
+          "reward": 200,
+          "penalty": 500,
+          "deadline": 1743252346
+        }
+      }
+    ],
+    "Get privy wallet data": [
+      {
+        "json": {
+          "walletId": "xxxxxxxxx",
+          "address": "0xCB4C94A027D461AcCd4A0C28322d556fa6d73D9b",
+          "chainId": "eip155:1"
+        }
+      }
+    ]
+  },
+  "versionId": "dc830d90-a7af-4c7e-8e64-68d632cb53b4",
   "triggerCount": 0,
   "tags": []
 }
