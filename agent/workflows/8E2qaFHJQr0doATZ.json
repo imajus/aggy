@@ -1,0 +1,331 @@
+{
+  "createdAt": "2025-03-22T07:28:23.524Z",
+  "updatedAt": "2025-03-22T10:04:51.000Z",
+  "id": "8E2qaFHJQr0doATZ",
+  "name": "MultiBaaS: Create Task",
+  "active": false,
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -20,
+        -220
+      ],
+      "id": "be048520-449c-4cfd-9a45-8cf9b525c7ee",
+      "name": "When clicking ‘Test workflow’"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "2b4d7d83-6238-4d7b-823e-755eb8b80685",
+              "name": "name",
+              "value": "=Test {{ Date.now() }}",
+              "type": "string"
+            },
+            {
+              "id": "db6a19b7-0b4a-4521-9ace-7ecc95d58a34",
+              "name": "details",
+              "value": "Adipisci eveniet voluptatem sed. Molestias nemo odio dicta corporis corrupti iusto optio. Voluptas vero repellendus aut qui vel asperiores nihil. Aut non ut autem magni dolores voluptatum consequatur sunt.  Ipsam dignissimos necessitatibus id cum. Autem quaerat occaecati impedit. Sequi explicabo doloremque corporis et enim et. Id voluptatem fugit reprehenderit et ut quasi dolore. Aliquid itaque et impedit.  Doloribus natus ad architecto sapiente dignissimos et. Voluptas beatae minima quae. Dicta dolorem ex laborum eius vitae at quam.  Sapiente ducimus ut voluptatem eos cumque ab. Qui exercitationem quia ducimus tempore perspiciatis autem aut. Sed ea id architecto voluptas esse sunt. Numquam consequatur non et suscipit quibusdam autem. Totam eaque molestiae laboriosam explicabo quibusdam quas fuga. Et nobis qui ut.  Deserunt sed maiores vel. Repudiandae ut magnam eius voluptates culpa sunt. Quia ad iusto qui deleniti. Magni qui doloremque ducimus. Perferendis nam consequuntur amet ratione. Vel error aut amet necessitatibus animi est natus.",
+              "type": "string"
+            },
+            {
+              "id": "defd2c1e-eca0-4542-bee2-cb88ebb302be",
+              "name": "reward",
+              "value": 1000,
+              "type": "number"
+            },
+            {
+              "id": "7ff9a906-084d-4114-aefb-dd1b004d0b9e",
+              "name": "penalty",
+              "value": 2000,
+              "type": "number"
+            },
+            {
+              "id": "3bf4dec3-cd8d-4901-bade-4841ed832de5",
+              "name": "deadline",
+              "value": "={{ Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 7 }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        200,
+        -220
+      ],
+      "id": "e0eef28e-8083-4f5e-bd4f-b95b5407ed8b",
+      "name": "Fake Task data"
+    },
+    {
+      "parameters": {
+        "action": "generate",
+        "dataPropertyName": "id"
+      },
+      "type": "n8n-nodes-base.crypto",
+      "typeVersion": 1,
+      "position": [
+        440,
+        0
+      ],
+      "id": "e8f4814b-216a-4b15-9493-6692654020ab",
+      "name": "Generate ID"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.MULTIBAAS_URL }}/addresses/aggy_core/contracts/aggy_core/methods/createTask",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "args",
+              "value": "={{ [[$json.name, $json.id, $json.details, $json.reward, $json.penalty, $json.deadline]] }}"
+            },
+            {
+              "name": "from",
+              "value": "0x0A2374C6659bd9dC9a2ECB13cb83C847dc4547D9"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        660,
+        0
+      ],
+      "id": "c5657715-9f79-4cf2-9af2-dcea84676f1d",
+      "name": "Prepare transaction",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "Kcme09pJN7p2gcFw",
+          "name": "MultiBaaS account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "name"
+            },
+            {
+              "name": "details"
+            },
+            {
+              "name": "reward",
+              "type": "number"
+            },
+            {
+              "name": "penalty",
+              "type": "number"
+            },
+            {
+              "name": "deadline",
+              "type": "number"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        200,
+        0
+      ],
+      "id": "c7b1bb36-0ed4-417e-a350-292478779be0",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "ufVKn88RUKasYLuV",
+          "mode": "list",
+          "cachedResultName": "MultiBaaS: Send transaction"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "to": "={{ $json.result.tx.to }}",
+            "data": "={{ $json.result.tx.data }}",
+            "value": "={{ $json.result.tx.value }}",
+            "type": "={{ $json.result.tx.type }}",
+            "nonce": "={{ $json.result.tx.nonce ?? 0 }}",
+            "maxPriorityFeePerGas": "={{ $json.result.tx.gasTipCap }}",
+            "maxFeePerGas": "={{ $json.result.tx.gasFeeCap }}",
+            "gasLimit": "={{ $json.result.tx.gas }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "to",
+              "displayName": "to",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "data",
+              "displayName": "data",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "value",
+              "displayName": "value",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "gasLimit",
+              "displayName": "gasLimit",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "number",
+              "removed": false
+            },
+            {
+              "id": "maxFeePerGas",
+              "displayName": "maxFeePerGas",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "number",
+              "removed": false
+            },
+            {
+              "id": "maxPriorityFeePerGas",
+              "displayName": "maxPriorityFeePerGas",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "number",
+              "removed": false
+            },
+            {
+              "id": "type",
+              "displayName": "type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "number"
+            },
+            {
+              "id": "nonce",
+              "displayName": "nonce",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "number",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": true,
+          "convertFieldsToString": true
+        },
+        "mode": "each",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        880,
+        0
+      ],
+      "id": "ceca6895-c79a-4d7d-acc3-099abcda5c2d",
+      "name": "Send transaction"
+    }
+  ],
+  "connections": {
+    "When clicking ‘Test workflow’": {
+      "main": [
+        [
+          {
+            "node": "Fake Task data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fake Task data": {
+      "main": [
+        [
+          {
+            "node": "Generate ID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate ID": {
+      "main": [
+        [
+          {
+            "node": "Prepare transaction",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare transaction": {
+      "main": [
+        [
+          {
+            "node": "Send transaction",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Generate ID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "611b423a-5b33-4077-99cc-f180485f568d",
+  "triggerCount": 0,
+  "tags": []
+}

@@ -2,7 +2,8 @@ FROM n8nio/n8n:latest
 # Install missing NPM packages
 USER root
 RUN npm i -g \
-	https://github.com/imajus/secretvaults-js.git#d3f9fcd94435692e405e59bce87cdf05c72bde80
+	https://github.com/imajus/secretvaults-js.git#d3f9fcd94435692e405e59bce87cdf05c72bde80 \
+	ethers@5
 # Import workflows & credentials from the project
 USER node
 COPY credentials .n8n/backup/credentials
