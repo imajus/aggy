@@ -36,11 +36,24 @@ contract AggyTask {
 
         task.data = _taskData;
         task.state.requester = _requester;
-        task.state.updated = block.timestamp;
+        task.state.created = uint64(block.timestamp);
+        task.state.updated = uint64(block.timestamp);
 
         oracle = OptimisticOracleExtended(_oracle);
 
         emit IAggyTask.TaskCreated(address(this), task);
+    }
+
+    /// @notice Update the UMA oracle address
+    /// @param _oracle The oracle address
+    function setUmaOracle(address _oracle) external onlyAggy {
+        oracle = OptimisticOracleExtended(_oracle);
+    }
+
+    /// @notice Update the UMA liveness
+    /// @param _liveness The liveness
+    function setUmaLiveness(uint64 _liveness) external onlyAggy {
+        umaLiveness = _liveness;
     }
 
     /// @notice Get the task's token balance
@@ -64,12 +77,14 @@ contract AggyTask {
 
         task.state.status = IAggyTask.TaskStatus.InProgress;
         task.state.contractor = _contractor;
-        task.state.updated = block.timestamp;
+        task.state.started = uint64(block.timestamp);
+        task.state.updated = uint64(block.timestamp);
 
         emit IAggyTask.TaskClaimed(address(this), task);
     }
 
     /// @notice Complete the task and put it into a review state
+    /// @param _contractor The contractor's address
     function completeTask(address _contractor) external onlyAggy {
         require(
             task.state.status == IAggyTask.TaskStatus.InProgress,
@@ -81,7 +96,8 @@ contract AggyTask {
         );
 
         task.state.status = IAggyTask.TaskStatus.UnderReview;
-        task.state.updated = block.timestamp;
+        task.state.submitted = uint64(block.timestamp);
+        task.state.updated = uint64(block.timestamp);
 
         // request resolution from the UMA optimistic oracle
         // only if oracle set
@@ -118,7 +134,7 @@ contract AggyTask {
             assertionId = oracle.assertTruth(
                 bytes(claim),
                 address(this), // asserter
-                address(0), // no callback
+                address(this), // callback
                 address(0), // no escalation manager
                 umaLiveness,
                 IERC20(defaultCurrency),
@@ -133,46 +149,6 @@ contract AggyTask {
         emit IAggyTask.TaskCompleted(address(this), task);
     }
 
-    /// @notice Resolve the task assertion
-    function resolveTask() external onlyAggy {
-        require(
-            task.state.status == IAggyTask.TaskStatus.UnderReview,
-            "AggyTask: task must be UnderReview"
-        );
-
-        require(address(oracle) != address(0), "AggyTask: oracle not set");
-
-        bool result = oracle.settleAndGetAssertionResult(assertionId);
-
-        if (result) {
-            task.state.status = IAggyTask.TaskStatus.Confirmed;
-            task.state.updated = block.timestamp;
-
-            require(
-                aggyToken.transfer(
-                    task.state.contractor,
-                    task.data.stakeAmount + task.data.rewardAmount
-                ),
-                "AggyTask: failed to transfer reward"
-            );
-
-            emit IAggyTask.TaskConfirmed(address(this), task);
-        } else {
-            task.state.status = IAggyTask.TaskStatus.Failed;
-            task.state.updated = block.timestamp;
-
-            require(
-                aggyToken.transfer(
-                    task.state.requester,
-                    task.data.stakeAmount + task.data.rewardAmount
-                ),
-                "AggyTask: failed to return funds"
-            );
-
-            emit IAggyTask.TaskFailed(address(this), task);
-        }
-    }
-
     /// @notice Confirm the task and transfer the reward amount to the contractor
     function confirmTask() external onlyAggy {
         require(
@@ -181,7 +157,8 @@ contract AggyTask {
         );
 
         task.state.status = IAggyTask.TaskStatus.Confirmed;
-        task.state.updated = block.timestamp;
+        task.state.finished = uint64(block.timestamp);
+        task.state.updated = uint64(block.timestamp);
 
         // transfer reward + stake amount from this contract to contractor
         require(
@@ -204,7 +181,8 @@ contract AggyTask {
         );
 
         task.state.status = IAggyTask.TaskStatus.Failed;
-        task.state.updated = block.timestamp;
+        task.state.finished = uint64(block.timestamp);
+        task.state.updated = uint64(block.timestamp);
 
         // transfer stake and reward amounts from this contract to the requester
         require(
@@ -219,6 +197,7 @@ contract AggyTask {
     }
 
     /// @notice Cancel the task and transfer the stake and reward amounts back to contractor and Aggy Core
+    /// @param _requester The requester's address
     function cancelTask(address _requester) external onlyAggy {
         require(
             task.state.status == IAggyTask.TaskStatus.Created ||
@@ -231,7 +210,8 @@ contract AggyTask {
         );
 
         task.state.status = IAggyTask.TaskStatus.Cancelled;
-        task.state.updated = block.timestamp;
+        task.state.finished = uint64(block.timestamp);
+        task.state.updated = uint64(block.timestamp);
 
         // split the difference - transfer stake amount back to contractor and reward amount back to the requester
         require(
@@ -244,5 +224,62 @@ contract AggyTask {
         );
 
         emit IAggyTask.TaskCancelled(address(this), task);
+    }
+
+    // UMA callbacks
+
+    /// @notice Callback from the UMA optimistic oracle when an assertion is resolved
+    /// @param _assertionId The assertion ID
+    /// @param _assertedTruth The asserted truth
+    function assertionResolvedCallback(
+        bytes32 _assertionId,
+        bool _assertedTruth
+    ) external {
+        require(
+            msg.sender == address(oracle),
+            "AggyTask: invalid oracle caller"
+        );
+        require(_assertionId == assertionId, "AggyTask: unknown assertion");
+
+        task.state.finished = uint64(block.timestamp);
+        task.state.updated = uint64(block.timestamp);
+
+        if (_assertedTruth) {
+            task.state.status = IAggyTask.TaskStatus.Confirmed;
+
+            require(
+                aggyToken.transfer(
+                    task.state.contractor,
+                    task.data.stakeAmount + task.data.rewardAmount
+                ),
+                "AggyTask: failed to transfer reward"
+            );
+
+            emit IAggyTask.TaskConfirmed(address(this), task);
+        } else {
+            task.state.status = IAggyTask.TaskStatus.Failed;
+
+            require(
+                aggyToken.transfer(
+                    task.state.requester,
+                    task.data.stakeAmount + task.data.rewardAmount
+                ),
+                "AggyTask: failed to return funds"
+            );
+
+            emit IAggyTask.TaskFailed(address(this), task);
+        }
+    }
+
+    /// @notice Callback from the UMA optimistic oracle when an assertion is disputed
+    /// @param _assertionId The assertion ID
+    function assertionDisputedCallback(bytes32 _assertionId) external {
+        require(
+            msg.sender == address(oracle),
+            "AggyTask: invalid oracle caller"
+        );
+        require(_assertionId == assertionId, "AggyTask: unknown assertion");
+
+        emit IAggyTask.TaskDisputed(address(this), _assertionId);
     }
 }

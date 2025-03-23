@@ -77,7 +77,7 @@ async function runTaskLifecycle(
 
   await hre.mbDeployer.link(signer, 'AggyTask', taskAddress, {
     addressLabel: 'aggy_task_' + taskIdShort,
-    contractVersion: '1.7',
+    contractVersion: '1.9',
     contractLabel: 'aggy_task',
   });
 
@@ -110,11 +110,13 @@ async function main() {
   const adminAccounts = [
     '0x0A2374C6659bd9dC9a2ECB13cb83C847dc4547D9', // D
     '0xf991A961d45667F78A49D3D802fd0EDF65118924', // J
+    '0x9540D5cA10E0003D63578E3a28cf2D4639d72139', // L
   ];
   const adminRole = '0x0000000000000000000000000000000000000000000000000000000000000000';
   const verifierRole = '0x0ce23c3e399818cfee81a7ab0880f714e53d7672b08df0fa62f2843416e1ea09';
 
   const optimisticOracleAddress = '0xFd9e2642a170aDD10F53Ee14a93FcF2F31924944';
+  // const optimisticOracleAddress = '0x0000000000000000000000000000000000000000';
 
   // AggyToken ----------------------------------------------------------------
 

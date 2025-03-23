@@ -64,6 +64,28 @@ contract AggyCore is AccessControl {
         optimisticOracle = _optimisticOracle;
     }
 
+    /// @notice Set the optimistic oracle address on a specified task
+    /// @param taskId The task ID
+    /// @param _optimisticOracle The optimistic oracle address
+    function setTaskOptimisticOracle(
+        string memory taskId,
+        address _optimisticOracle
+    ) external onlyRole(DEFAULT_ADMIN_ROLE) {
+        address taskAddress = taskFactory.getTaskAddressById(taskId);
+        IAggyTask(taskAddress).setUmaOracle(_optimisticOracle);
+    }
+
+    /// @notice Set the optimistic oracle liveness on a specified task
+    /// @param taskId The task ID
+    /// @param _liveness The liveness
+    function setTaskUmaLiveness(
+        string memory taskId,
+        uint64 _liveness
+    ) external onlyRole(DEFAULT_ADMIN_ROLE) {
+        address taskAddress = taskFactory.getTaskAddressById(taskId);
+        IAggyTask(taskAddress).setUmaLiveness(_liveness);
+    }
+
     // Tasks -------------------------------------------------------------------
 
     /// @notice Create a task
