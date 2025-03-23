@@ -1,10 +1,9 @@
 import "./globals.css";
 import type { Metadata } from "next";
 import { ReactNode } from "react";
-import { AuthProvider } from "@/context/AuthContext";
 import Providers from "@/components/Providers";
-import Sidebar from "@/components/Sidebar";
-import Header from "@/components/Header";
+import AuthGuard from "./AuthGaurd";
+import WalletDisplay from '@/components/WalletDisplay';
 
 export const metadata: Metadata = {
   title: "Aggy Dapp",
@@ -14,25 +13,13 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
-      {/* 
-        Use a dark default text color and a light background from your theme.
-        'text-text-primary' => #2D3748
-        'bg-background-main' => #F7FAFC
-      */}
       <body className="bg-[#F7FAFC] text-[#2D3748]">
-        <AuthProvider>
-          <Providers>
-            <div className="flex h-screen">
-              <Sidebar />
-              <div className="flex-1 flex flex-col">
-                <Header />
-                <main className="flex-1 overflow-y-auto p-4 bg-background-main">
-                  {children}
-                </main>
-              </div>
-            </div>
-          </Providers>
-        </AuthProvider>
+        <Providers>
+          {/* The AuthGuard decides whether to show the LandingPage or the main UI */}
+          <AuthGuard>
+            {children}
+          </AuthGuard>
+        </Providers>
       </body>
     </html>
   );
