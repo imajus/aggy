@@ -9,7 +9,7 @@ export function TextArea({ label, error, className = '', ...props }: TextAreaPro
   return (
     <div className="space-y-1">
       {label && (
-        <label className="block text-sm font-medium text-[#2D3748]">
+        <label className="block text-sm font-medium text-[#3173E2]">
           {label}
         </label>
       )}

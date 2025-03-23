@@ -16,9 +16,9 @@ export const theme = {
       sidebar: '#EDF2F7',
     },
     text: {
-      primary: '#2D3748', // Dark grey for main text
+      primary: '#3173E2', // Dark grey for main text
       secondary: '#4A5568', // Medium grey for secondary text
-      light: '#718096', // Light grey for subtle text
+      light: '#676FFF', // Light blue for subtle text
     },
     border: '#E2E8F0',
   },

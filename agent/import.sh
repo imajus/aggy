@@ -5,15 +5,11 @@ docker run \
   -v aggy-data:/home/node/.n8n \
   -v ./workflows:/backups \
   definitelynotskynet/aggy-agent:dev \
-  export:workflow \
-  --backup \
-  --output=/backups
+  import:workflows --separate --input=/backups
 # Credentials
 docker run \
   --env-file=.env \
   -v aggy-data:/home/node/.n8n \
   -v ./credentials:/backups \
   definitelynotskynet/aggy-agent:dev \
-  export:credentials \
-  --backup \
-  --output=/backups
+  import:credentials --separate --input=/backups

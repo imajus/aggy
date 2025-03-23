@@ -1,5 +1,4 @@
 import { ButtonHTMLAttributes, ReactNode } from 'react';
-import { theme } from '@/styles/theme';
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'secondary' | 'outline';
@@ -11,6 +10,7 @@ export function Button({
   variant = 'primary',
   size = 'md',
   children,
+  onClick,
   className = '',
   ...props
 }: ButtonProps) {
@@ -32,6 +32,7 @@ export function Button({
     <button
       className={`${baseStyles} ${variantStyles[variant]} ${sizeStyles[size]} ${className}`}
       {...props}
+      onClick={onClick}
     >
       {children}
     </button>

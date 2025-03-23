@@ -1,0 +1,72 @@
+{
+  "createdAt": "2025-03-21T16:31:39.156Z",
+  "updatedAt": "2025-03-23T06:07:31.000Z",
+  "id": "YGcHT3h960D0pDyR",
+  "name": "Nillion SecretVault: Get Task data",
+  "active": false,
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "taskId"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -2000,
+        180
+      ],
+      "id": "4da46925-9783-499c-8ccd-adc7ab41e5f0",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const { SecretVaultWrapper } = require('secretvaults');\n\nconst nodes = [\n  {\n    url: 'https://nildb-nx8v.nillion.network',\n    did: 'did:nil:testnet:nillion1qfrl8nje3nvwh6cryj63mz2y6gsdptvn07nx8v',\n  },\n  {\n    url: 'https://nildb-p3mx.nillion.network',\n    did: 'did:nil:testnet:nillion1uak7fgsp69kzfhdd6lfqv69fnzh3lprg2mp3mx',\n  },\n  {\n    url: 'https://nildb-rugk.nillion.network',\n    did: 'did:nil:testnet:nillion1kfremrp2mryxrynx66etjl8s7wazxc3rssrugk',\n  },\n];\n\nconst collection = new SecretVaultWrapper(\n  nodes,\n  {\n    secretKey: $env.NILLION_ORG_SECRET_KEY,\n    orgDid: $env.NILLION_ORG_DID,\n  },\n  $env.NILLION_VAULT_SCHEMA_ID\n);\nawait collection.init();\n\nconst result = await collection.readFromNodes({\n  '_id': $input.item.json.taskId,\n});\n\nreturn { json: { result } };"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1780,
+        180
+      ],
+      "id": "cdc24a10-8d95-454e-9eba-4c14515aceeb",
+      "name": "Get record"
+    }
+  ],
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Get record",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {
+    "When Executed by Another Workflow": [
+      {
+        "json": {
+          "taskId": "e4ce3537-4b28-46a2-8e93-76f2421e8b67"
+        }
+      }
+    ]
+  },
+  "versionId": "05b41306-69cb-4d54-8ccb-46fbdd36a467",
+  "triggerCount": 0,
+  "tags": []
+}

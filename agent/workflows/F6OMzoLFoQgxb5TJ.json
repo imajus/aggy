@@ -1,0 +1,237 @@
+{
+  "createdAt": "2025-03-21T14:32:53.505Z",
+  "updatedAt": "2025-03-22T13:43:01.000Z",
+  "id": "F6OMzoLFoQgxb5TJ",
+  "name": "Privy: Get user wallet data",
+  "active": false,
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "userId"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        240,
+        240
+      ],
+      "id": "9efe416d-eb07-48ce-ba77-df6e45120030",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "linked_accounts",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        680,
+        240
+      ],
+      "id": "54f074d8-6b47-4f9f-ad15-b495619629aa",
+      "name": "Split out accounts"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "9dfb8822-416f-4913-b1bc-278c6e0a6ef1",
+              "leftValue": "={{ $json.type }}",
+              "rightValue": "wallet",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            },
+            {
+              "id": "5756aa16-40b0-4934-a752-83e5f6fc6756",
+              "leftValue": "={{ $json.delegated }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        900,
+        240
+      ],
+      "id": "4b7dbfe9-5c48-4a39-bbf1-ca3179a267b7",
+      "name": "Filter delegated wallets"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ae97d7f8-5778-4703-b657-ba50eeb8d7f5",
+              "name": "walletId",
+              "value": "={{ $json.id }}",
+              "type": "string"
+            },
+            {
+              "id": "566ff392-7e0a-4c29-8d4c-7f3c9ba8bae7",
+              "name": "address",
+              "value": "={{ $json.address }}",
+              "type": "string"
+            },
+            {
+              "id": "64b9fb69-346f-4bdc-9a3b-390094f7183f",
+              "name": "chainId",
+              "value": "={{ $json.chain_id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1340,
+        240
+      ],
+      "id": "5eb304c4-af43-4861-ab3b-89e06ddc6213",
+      "name": "Extract wallet data"
+    },
+    {
+      "parameters": {
+        "url": "=https://api.privy.io/v1/users/did:privy:{{ $json.userId }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "privy-app-id",
+              "value": "={{ $env.PRIVY_APP_ID }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        460,
+        240
+      ],
+      "id": "1efddf0f-11fe-485e-947b-4fd69417938d",
+      "name": "Get user accounts",
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "My1tBeOB2YcD5gFY",
+          "name": "Privy credential"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        1120,
+        240
+      ],
+      "id": "8b9aafe6-d6d8-464b-bf29-fa9e134a5b60",
+      "name": "Limit to 1"
+    }
+  ],
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Get user accounts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split out accounts": {
+      "main": [
+        [
+          {
+            "node": "Filter delegated wallets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter delegated wallets": {
+      "main": [
+        [
+          {
+            "node": "Limit to 1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get user accounts": {
+      "main": [
+        [
+          {
+            "node": "Split out accounts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Limit to 1": {
+      "main": [
+        [
+          {
+            "node": "Extract wallet data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {
+    "When Executed by Another Workflow": [
+      {
+        "json": {
+          "userId": "cm8k7kgle005mday68m1l2zlz"
+        }
+      }
+    ]
+  },
+  "versionId": "13123388-d338-4883-9934-ae0461a55a43",
+  "triggerCount": 0,
+  "tags": []
+}
