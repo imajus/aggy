@@ -7,7 +7,7 @@ export const fetchTasks = async (): Promise<TaskResponse> => {
     { args: [] },
     {
       headers: {
-        Authorization: `Bearer ${process.env.NEXT_PUBLIC_API_TOKEN}`,
+        'Authorization': `Bearer ${process.env.NEXT_PUBLIC_MULTIBAAS_KEY}`,
         'Content-Type': 'application/json',
       },
     }

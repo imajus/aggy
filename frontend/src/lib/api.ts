@@ -1,12 +1,16 @@
 
 import axios from 'axios';
 
+console.log(process.env.NEXT_PUBLIC_MULTIBAAS_URL);
+console.log(process.env.NEXT_PUBLIC_MULTIBAAS_KEY);
+
 // Example function to fetch data with authorization
 export async function fetchData(endpoint: string) {
   try {
     const response = await axios.get(`${process.env.NEXT_PUBLIC_MULTIBAAS_URL}${endpoint}`, {
       headers: {
-        Authorization: `Bearer ${process.env.NEXT_PUBLIC_MULTIBAAS_KEY}`, // Include the authorization token
+        'Authorization': `Bearer ${process.env.NEXT_PUBLIC_MULTIBAAS_KEY}`, // Include the authorization token
+        'Content-Type': 'application/json',
       },
     });
     return response.data;
@@ -16,18 +20,30 @@ export async function fetchData(endpoint: string) {
   }
 }
 
+export async function getTokenAddress() {
+  const resp = await fetch(
+    `${process.env.NEXT_PUBLIC_MULTIBAAS_URL}/addresses/aggy_token`,
+    {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${process.env.NEXT_PUBLIC_MULTIBAAS_KEY}`,
+        'Content-Type': 'application/json',
+      }
+    }
+  );
+  const data = await resp.json();
+  return data.result.address;
+}
+
 
 export async function getCoreAddress() {
-    console.log(process.env.NEXT_PUBLIC_MULTIBAAS_URL);
-    console.log(process.env.NEXT_PUBLIC_MULTIBAAS_KEY);
-
-
     const resp = await fetch(
       `${process.env.NEXT_PUBLIC_MULTIBAAS_URL}/addresses/aggy_core`,
       {
         method: 'GET',
         headers: {
-          Authorization: `Bearer ${process.env.NEXT_PUBLIC_MULTIBAAS_KEY}`
+          'Authorization': `Bearer ${process.env.NEXT_PUBLIC_MULTIBAAS_KEY}`,
+          'Content-Type': 'application/json',
         }
       }
     );
@@ -46,7 +62,8 @@ export async function getCoreAddress() {
            value: amount,
         }),
         headers: {
-          Authorization: `Bearer ${process.env.NEXT_PUBLIC_MULTIBAAS_KEY}`
+          'Authorization': `Bearer ${process.env.NEXT_PUBLIC_MULTIBAAS_KEY}`,
+          'Content-Type': 'application/json',
         }
       }
     );
@@ -64,7 +81,8 @@ export async function getCoreAddress() {
           from: address,
         }),
         headers: {
-          Authorization: `Bearer ${process.env.NEXT_PUBLIC_MULTIBAAS_KEY}`
+          'Authorization': `Bearer ${process.env.NEXT_PUBLIC_MULTIBAAS_KEY}`,
+          'Content-Type': 'application/json',
         }
       }
     );
@@ -82,7 +100,8 @@ export async function getCoreAddress() {
            from,
         }),
         headers: {
-          Authorization: `Bearer ${process.env.NEXT_PUBLIC_MULTIBAAS_KEY}`
+          'Authorization': `Bearer ${process.env.NEXT_PUBLIC_MULTIBAAS_KEY}`,
+          'Content-Type': 'application/json',
         }
       }
     );
