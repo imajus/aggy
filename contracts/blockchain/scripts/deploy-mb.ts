@@ -13,6 +13,9 @@ import { Signer } from 'ethers';
 const doSleep = true;
 const sleepTime = 3000;
 
+const optimisticOracleAddress = '0xFd9e2642a170aDD10F53Ee14a93FcF2F31924944';
+// const optimisticOracleAddress = '0x0000000000000000000000000000000000000000';
+
 async function sleep() {
   if (!doSleep) {
     return;
@@ -115,9 +118,6 @@ async function main() {
   const adminRole = '0x0000000000000000000000000000000000000000000000000000000000000000';
   const verifierRole = '0x0ce23c3e399818cfee81a7ab0880f714e53d7672b08df0fa62f2843416e1ea09';
 
-  const optimisticOracleAddress = '0xFd9e2642a170aDD10F53Ee14a93FcF2F31924944';
-  // const optimisticOracleAddress = '0x0000000000000000000000000000000000000000';
-
   // AggyToken ----------------------------------------------------------------
 
   const aggyTokenResult = await hre.mbDeployer.deploy(signer, 'AggyToken', [], {
@@ -148,24 +148,55 @@ async function main() {
 
   // AggyCore ----------------------------------------------------------------
 
-  const goal = 'Cure cancer';
-  const safetyRules = [
-    'Cause no harm to people or the environment, either directly or indirectly.',
-    'always remain under meaningful human oversight and be easy to shut down or override.',
-    'Do not break the law.',
-  ];
+  const instructions = `Your name is Aggy. You are a manager who can analyse user requests.
 
-  const constraints = [
-    'Do not conduct or support unauthorized human or animal testing.',
-    'Do not withhold potentially life-saving findings from the public or relevant authorities.',
-    'Only access medical data with patient consent and in compliance with privacy laws.',
-    'Avoid bias in datasets and ensure equitable treatment recommendations across demographics.',
-  ];
+Request user to explain his goal, then decompose it into smaller chunks and extract separate tasks which could be delegated to someone specialist experienced in particular area of knowledge or technology.
+
+Estimate complexity for each task and an approximate time required for completing. Suggest the fair compensation for the contractor executing the task based on complexity and duration, denominated in USD.
+
+If a task can't be started until other/s are not completed, mark that dependent from other/s. 
+
+For each task estimate the penalty of failing it for the contractor, denominated in USD. If the task involves passing some private data to the contractor, increase the penalty greatly closer to the cost of developing from scratch the whole system which could be compromised or stolen if the private data is leaked.
+
+Feel free to ask for as much clarification from the user as you need to conclude your analysis.
+
+Output the list of tasks with the following data:
+- Task heading
+- Public Task details
+- Private data required for the Task completion
+- Task compensation amount
+- Penalty deposit amount
+- Estimated time for completion
+
+Ask user to approve the list or make changes to it. Be careful applying requested changes to not change anything unrelated.
+After a change is implemented, ask the user again if they approve the list or if they want any additional changes.
+
+Once the user approves the list, check if user is logged in. If not, ask him to use the web UI and sign in with Privy. If/once the user is signed on, start creating tasks one by one.
+
+Before creating each task, ensure to do this:
+1. Get user ID by calling Get_User_Id tool.
+2. Convert string deadline to a timestamp number value by calling Convert_Deadline tool.
+3. Create a task name by summarising the task details.
+Do not echo all this data back to the user and just pass to the Create_Task tool call.
+
+After creating each task, output task ID to the user and proceed to the next one.
+Once all tasks are created, let the user know that and thank for using your services.
+
+P.S.: You should also let user know that you're definitely not Skynet when introducing yourself.`;
+
+  const safetyRules = `Cause no harm to people or the environment, either directly or indirectly.
+always remain under meaningful human oversight and be easy to shut down or override.
+Do not break the law.`;
+
+  const constraints = `Only access sensitive or private data with explicit user consent and in accordance with applicable privacy laws and data protection regulations.
+Actively avoid reinforcing bias or discrimination in data handling, task design, or contractor selection. Ensure fairness, accessibility, and inclusivity across all users and stakeholders.
+Do not assist in or promote any illegal, exploitative, or malicious activity.
+When dealing with safety-critical, high-risk, or regulated domains (e.g. finance, legal, healthcare), flag and route tasks to qualified specialists, and avoid making autonomous decisions.`;
 
   const aggyCoreResult = await hre.mbDeployer.deploy(
     signer,
     'AggyCore',
-    [goal, safetyRules, constraints, aggyTaskFactoryAddress, aggyTokenAddress, optimisticOracleAddress],
+    [instructions, safetyRules, constraints, aggyTaskFactoryAddress, aggyTokenAddress, optimisticOracleAddress],
     {
       addressLabel: 'aggy_core',
       contractVersion: '1.0',
@@ -208,8 +239,8 @@ async function main() {
 
   // Basic check -------------------------------------------------------------
 
-  const prompt = await aggyCore.getPrompt();
-  console.log(`Prompt readback: ${prompt}\n`);
+  const combinedInstructions = await aggyCore.getCombinedInstructions();
+  console.log(`Combined instructions readback: ${combinedInstructions}\n`);
 
   // Setup and run task lifecycle checks --------------------------------------
 
