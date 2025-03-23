@@ -1,0 +1,29 @@
+export interface TaskData {
+    data: {
+      deadline: string;
+      details: string;
+      id: string;
+      name: string;
+      rewardAmount: string;
+      stakeAmount: string;
+    };
+    state: {
+      contractor: string;
+      created: string;
+      finished: string;
+      requester: string;
+      started: string;
+      status: number;
+      submitted: string;
+      updated: string;
+    };
+  }
+  
+  export interface TaskResponse {
+    status: number;
+    message: string;
+    result: {
+      kind: string;
+      output: TaskData[];
+    };
+  }
