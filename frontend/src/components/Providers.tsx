@@ -2,8 +2,9 @@
 
 import { PrivyProvider } from "@privy-io/react-auth";
 import React from "react";
-import { base, baseSepolia } from 'viem/chains';
+import { base, baseSepolia, sepolia } from 'viem/chains';
 import ReactQueryProvider from "./ReactQueryProvider";
+import { sep } from "path";
 
 export default function Providers({ children }: { children: React.ReactNode }) {
   const privyAppId = process.env.NEXT_PUBLIC_PRIVY_APP_ID || '';
@@ -17,8 +18,8 @@ export default function Providers({ children }: { children: React.ReactNode }) {
               theme: 'light',
               accentColor: '#676FFF',
             },
-            defaultChain: baseSepolia,
-            supportedChains: [base, baseSepolia],
+            defaultChain: sepolia,
+            supportedChains: [base, baseSepolia, sepolia],
             embeddedWallets: {
               createOnLogin: 'all-users'
             }

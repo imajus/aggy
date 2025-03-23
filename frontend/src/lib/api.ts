@@ -59,7 +59,6 @@ export async function getCoreAddress() {
         body: JSON.stringify({
            args: [await getCoreAddress(), amount],
            from,
-           value: amount,
         }),
         headers: {
           'Authorization': `Bearer ${process.env.NEXT_PUBLIC_MULTIBAAS_KEY}`,
@@ -106,6 +105,7 @@ export async function getCoreAddress() {
       }
     );
     const data = await resp.json();
+    console.log("claimTask", data);
     return data.result.tx;
   }
   

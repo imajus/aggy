@@ -19,6 +19,8 @@ export function useClaimTask() {
   const [error, setError] = useState<Error | null>(null);
   const [privateData, setPrivateData] = useState<any>(null);
 
+  const chainId = process.env.NEXT_PUBLIC_MULTIBAAS_CHAIN_ID as unknown as number || 11155111;
+
   // This function does the entire claim process
   const claim = useCallback(
     async (taskId: string, stakeAmount: number) => {
@@ -40,8 +42,7 @@ export function useClaimTask() {
         //    If your contract requires a separate TX for approving, do it here:
         await sendTransaction({
           to: approveTx.to,
-          chainId: process.env.NEXT_PUBLIC_MULTIBAAS_CHAIN_ID as unknown as number || 84532,
-          nonce: approveTx.nonce ?? 0,
+          chainId,
           data: approveTx.data,
           value: approveTx.value,
           type: approveTx.type,
@@ -52,11 +53,16 @@ export function useClaimTask() {
         // 3) Now call claimTask => returns a TX to sign
         const claimTx = await claimTask(wallet.address, taskId);
 
+        console.log("claimTx", claimTx);
+
+        console.log("gasFeeCap", claimTx.gasFeeCap);
+        console.log("gasTipCap", claimTx.gasTipCap);
+
+
         // 4) Sign & send the claim TX
         await sendTransaction({
           to: claimTx.to,
-          chainId: process.env.NEXT_PUBLIC_MULTIBAAS_CHAIN_ID as unknown as number || 84532,
-          nonce: claimTx.nonce ?? 0,
+          chainId,
           data: claimTx.data,
           value: claimTx.value,
           type: claimTx.type,
