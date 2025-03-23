@@ -11,7 +11,7 @@ interface LoginWalletButtonProps {
     children?: any;
 }
 
-export function LoginWalletButton({ type = 'button', className = '', children, }: LoginWalletButtonProps) {
+export function LoginWalletButton({ type = 'button', className = '', children }: LoginWalletButtonProps) {
     const { authenticated, logout, user, ready } = usePrivy();
     const { login } = useLogin();
     const [isLoading, setIsLoading] = useState(false);
