@@ -1,6 +1,6 @@
 {
   "createdAt": "2025-03-23T06:04:43.636Z",
-  "updatedAt": "2025-03-23T06:31:02.000Z",
+  "updatedAt": "2025-03-23T06:45:53.000Z",
   "id": "iiEWQuPdY1KZKLol",
   "name": "Aggy: Get Task private data",
   "active": true,
@@ -198,6 +198,29 @@
       ],
       "id": "97d11483-2110-4268-ac7e-d77a565d380a",
       "name": "Stop and Error"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "61eef3d2-f6c0-40dc-9a29-8442d3e4fa2e",
+              "name": "data",
+              "value": "={{ $json.result[0].data }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1100,
+        -100
+      ],
+      "id": "5afb83e3-7a62-4df1-ba53-73c0df521dde",
+      "name": "Extract data"
     }
   ],
   "connections": {
@@ -251,6 +274,17 @@
           }
         ]
       ]
+    },
+    "Execute Workflow": {
+      "main": [
+        [
+          {
+            "node": "Extract data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "settings": {
@@ -279,7 +313,7 @@
       }
     ]
   },
-  "versionId": "aa9cedb1-6138-4e68-b002-d5e0c43ebef7",
+  "versionId": "fdefe06d-7d8e-4fa1-9758-2d6d8881fee0",
   "triggerCount": 1,
   "tags": []
 }
