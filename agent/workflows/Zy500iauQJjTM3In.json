@@ -1,6 +1,6 @@
 {
   "createdAt": "2025-03-20T18:55:17.959Z",
-  "updatedAt": "2025-03-23T05:35:08.000Z",
+  "updatedAt": "2025-03-23T05:36:43.000Z",
   "id": "Zy500iauQJjTM3In",
   "name": "Aggy AI agent",
   "active": true,
@@ -263,7 +263,8 @@
           "id": "iq6d1pB9Re0Dp5tF",
           "name": "Nillion SecretLLM account"
         }
-      }
+      },
+      "disabled": true
     },
     {
       "parameters": {
@@ -453,7 +454,7 @@
       }
     ]
   },
-  "versionId": "553c9e85-8cb9-459c-afa5-6e82b423a63e",
+  "versionId": "41178c81-8379-4c85-b44c-335092f427eb",
   "triggerCount": 3,
   "tags": []
 }
