@@ -5,7 +5,7 @@ import { usePrivy } from "@privy-io/react-auth";
 import Sidebar from "@/components/Sidebar";
 import Header from "@/components/Header";
 
-import LandingPage from "./page";
+import LandingPage from "../../app/page";
 
 export default function AuthGuard({ children }: { children: ReactNode }) {
   const { authenticated } = usePrivy();

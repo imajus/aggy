@@ -1,6 +1,6 @@
 import { LoginWalletButton } from "@/components/LoginWalletButton";
-import EmbeddedWalletDisplay from "./EmbeddedWalletDisplay";
 import AggyBalanceDisplay from "./AggyBalanceDisplay";
+import EmbeddedWalletDisplay from "./EmbeddedWalletDisplay";
 
 export default function Header() {
   return (
