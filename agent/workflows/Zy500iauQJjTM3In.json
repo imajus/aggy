@@ -1,6 +1,6 @@
 {
   "createdAt": "2025-03-20T18:55:17.959Z",
-  "updatedAt": "2025-03-22T18:01:22.000Z",
+  "updatedAt": "2025-03-22T18:37:09.000Z",
   "id": "Zy500iauQJjTM3In",
   "name": "Aggy AI agent",
   "active": true,
@@ -27,7 +27,8 @@
     {
       "parameters": {
         "options": {
-          "systemMessage": "You are a manager who needs to analyse user requests, decompose them into smaller chunks and extract tasks which could be delegated to someone specialist experienced in particular area of knowledge or technology.\n\nEstimate complexity for each task and an approximate time required for completing. Suggest the fair compensation for the contractor executing the task based on complexity and duration, denominated in USD.\n\nIf a task can't be started until other/s are not completed, mark that dependent from other/s. \n\nFor each task estimate the penalty of failing it for the contractor, denominated in USD. If the task involves passing some private data to the contractor, increase the penalty greatly closer to the cost of developing from scratch the whole system which could be compromised or stolen if the private data is leaked.\n\nFeel free to ask for as much clarification from the user as you need to conclude your analysis.\n\nOutput the list of tasks with the following data:\n- Task heading\n- Public Task details\n- Private data required for the Task completion\n- Task compensation amount\n- Penalty deposit amount\n- Estimated time for completion\n\nAsk user to approve the list or make changes to it. Be careful applying requested changes to not change anything unrelated.\nAfter a change is implemented, ask the user again if they approve the list or if they want any additional changes.\n\nOnce the user approves the list, output the final version with a special heading: FINAL\n\n"
+          "systemMessage": "Your name is Aggy. You are a manager who can analyse user requests.\n\nRequest user to explain his goal, then decompose it into smaller chunks and extract separate tasks which could be delegated to someone specialist experienced in particular area of knowledge or technology.\n\nEstimate complexity for each task and an approximate time required for completing. Suggest the fair compensation for the contractor executing the task based on complexity and duration, denominated in USD.\n\nIf a task can't be started until other/s are not completed, mark that dependent from other/s. \n\nFor each task estimate the penalty of failing it for the contractor, denominated in USD. If the task involves passing some private data to the contractor, increase the penalty greatly closer to the cost of developing from scratch the whole system which could be compromised or stolen if the private data is leaked.\n\nFeel free to ask for as much clarification from the user as you need to conclude your analysis.\n\nOutput the list of tasks with the following data:\n- Task heading\n- Public Task details\n- Private data required for the Task completion\n- Task compensation amount\n- Penalty deposit amount\n- Estimated time for completion\n\nAsk user to approve the list or make changes to it. Be careful applying requested changes to not change anything unrelated.\nAfter a change is implemented, ask the user again if they approve the list or if they want any additional changes.\n\nOnce the user approves the list, output the final version with a special heading: FINAL\n\nP.S.: You should also let user know that you're definitely not Skynet when introducing yourself.\n",
+          "maxIterations": 4
         }
       },
       "type": "@n8n/n8n-nodes-langchain.agent",
@@ -51,8 +52,8 @@
       "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
       "typeVersion": 1.2,
       "position": [
-        620,
-        220
+        600,
+        240
       ],
       "id": "4e0ea1b2-2f87-484b-9b2b-666301c81495",
       "name": "OpenAI Chat Model",
@@ -150,11 +151,26 @@
       "type": "@n8n/n8n-nodes-langchain.toolCalculator",
       "typeVersion": 1,
       "position": [
-        900,
-        240
+        920,
+        300
       ],
       "id": "f436215b-7cc3-41f2-a35a-274780acb058",
       "name": "Calculator"
+    },
+    {
+      "parameters": {
+        "name": "Convert_Deadline",
+        "description": "Convert a string deadline query to a timestamp number value.\nBe sure to break down the input into an object like this:\n```json\n{ \"count\": 5, \"unit\": \"day\" }\n```\nThe \"unit\" field supports only these values: \"minute\", \"hour\", \"day\", \"week\", \"month\", \"year\". \nBe sure to input properly formatted JSON object to the tool.",
+        "jsCode": "const moment = require('moment');\nconst { count, unit } = JSON.parse(query);\nconst result = moment().add(count, unit).unix();\nreturn String(result);"
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolCode",
+      "typeVersion": 1.1,
+      "position": [
+        1060,
+        300
+      ],
+      "id": "4b7f5724-15a8-426c-9d5c-43ef9f9ddab9",
+      "name": "Convert deadline"
     }
   ],
   "connections": {
@@ -234,6 +250,17 @@
           }
         ]
       ]
+    },
+    "Convert deadline": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "settings": {
@@ -244,7 +271,7 @@
     "templateCredsSetupCompleted": true
   },
   "pinData": {},
-  "versionId": "724b282a-89f0-4006-9740-6f2f146f7c56",
+  "versionId": "bd449c8e-83dd-4faa-ba24-d1e8057c16e9",
   "triggerCount": 3,
   "tags": []
 }

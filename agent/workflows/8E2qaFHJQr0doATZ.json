@@ -1,6 +1,6 @@
 {
   "createdAt": "2025-03-22T07:28:23.524Z",
-  "updatedAt": "2025-03-22T13:46:40.000Z",
+  "updatedAt": "2025-03-22T18:47:32.000Z",
   "id": "8E2qaFHJQr0doATZ",
   "name": "MultiBaaS + Privy: Create Task",
   "active": false,
@@ -14,46 +14,10 @@
       "typeVersion": 1,
       "position": [
         880,
-        115
+        55
       ],
       "id": "e8f4814b-216a-4b15-9493-6692654020ab",
       "name": "Generate ID"
-    },
-    {
-      "parameters": {
-        "method": "POST",
-        "url": "={{ $env.MULTIBAAS_URL }}/addresses/aggy_core/contracts/aggy_core/methods/createTask",
-        "authentication": "genericCredentialType",
-        "genericAuthType": "httpHeaderAuth",
-        "sendBody": true,
-        "bodyParameters": {
-          "parameters": [
-            {
-              "name": "args",
-              "value": "={{ [[$json.name, $json.id, $json.details, $json.reward, $json.penalty, $json.deadline]] }}"
-            },
-            {
-              "name": "from",
-              "value": "={{ $json.address }}"
-            }
-          ]
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.2,
-      "position": [
-        1100,
-        115
-      ],
-      "id": "c5657715-9f79-4cf2-9af2-dcea84676f1d",
-      "name": "Prepare transaction",
-      "credentials": {
-        "httpHeaderAuth": {
-          "id": "Kcme09pJN7p2gcFw",
-          "name": "MultiBaaS account"
-        }
-      }
     },
     {
       "parameters": {
@@ -87,10 +51,142 @@
       "typeVersion": 1.1,
       "position": [
         220,
-        120
+        55
       ],
       "id": "c7b1bb36-0ed4-417e-a350-292478779be0",
       "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "F6OMzoLFoQgxb5TJ",
+          "mode": "list",
+          "cachedResultName": "Privy: Get user wallet data"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "userId": "={{ $json.userId }}"
+          },
+          "matchingColumns": [
+            "userId"
+          ],
+          "schema": [
+            {
+              "id": "userId",
+              "displayName": "userId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "mode": "each",
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        440,
+        -20
+      ],
+      "id": "0c002a42-71ee-40db-8c62-069b60320476",
+      "name": "Get privy wallet data"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [
+        660,
+        55
+      ],
+      "id": "fb5620c1-e384-4864-bad0-09cd11c10f63",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.MULTIBAAS_URL }}/addresses/aggy_token/contracts/aggy_token/methods/approve",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "args",
+              "value": "={{ [$json.address, $json.reward] }}"
+            },
+            {
+              "name": "from",
+              "value": "={{ $json.address }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1100,
+        55
+      ],
+      "id": "0c8e8cae-8c39-41d1-b925-1444f5621fd6",
+      "name": "Prepare deposit tx",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "Kcme09pJN7p2gcFw",
+          "name": "MultiBaaS account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.MULTIBAAS_URL }}/addresses/aggy_core/contracts/aggy_core/methods/createTask",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "args",
+              "value": "={{ [[$json.name, $json.id, $json.details, $json.reward, $json.penalty, $json.deadline]] }}"
+            },
+            {
+              "name": "from",
+              "value": "={{ $json.address }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1540,
+        55
+      ],
+      "id": "c5657715-9f79-4cf2-9af2-dcea84676f1d",
+      "name": "Prepare create tx",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "Kcme09pJN7p2gcFw",
+          "name": "MultiBaaS account"
+        }
+      }
     },
     {
       "parameters": {
@@ -212,70 +308,135 @@
       "typeVersion": 1.2,
       "position": [
         1320,
-        115
+        55
       ],
       "id": "ceca6895-c79a-4d7d-acc3-099abcda5c2d",
-      "name": "Send transaction"
+      "name": "Send deposit tx"
     },
     {
       "parameters": {
         "workflowId": {
           "__rl": true,
-          "value": "F6OMzoLFoQgxb5TJ",
+          "value": "ufVKn88RUKasYLuV",
           "mode": "list",
-          "cachedResultName": "Privy: Get user wallet data"
+          "cachedResultName": "MultiBaaS: Send transaction"
         },
         "workflowInputs": {
           "mappingMode": "defineBelow",
           "value": {
-            "userId": "={{ $json.userId }}"
+            "to": "={{ $json.result.tx.to }}",
+            "data": "={{ $json.result.tx.data }}",
+            "value": "={{ $json.result.tx.value }}",
+            "type": "={{ $json.result.tx.type }}",
+            "nonce": "={{ $json.result.tx.nonce ?? 0 }}",
+            "maxPriorityFeePerGas": "={{ $json.result.tx.gasTipCap }}",
+            "maxFeePerGas": "={{ $json.result.tx.gasFeeCap }}",
+            "gasLimit": "={{ $json.result.tx.gas }}",
+            "walletId": "={{ $('Generate ID').item.json.walletId }}"
           },
-          "matchingColumns": [
-            "userId"
-          ],
+          "matchingColumns": [],
           "schema": [
             {
-              "id": "userId",
-              "displayName": "userId",
+              "id": "walletId",
+              "displayName": "walletId",
               "required": false,
               "defaultMatch": false,
               "display": true,
               "canBeUsedToMatch": true,
               "type": "string",
               "removed": false
+            },
+            {
+              "id": "to",
+              "displayName": "to",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "data",
+              "displayName": "data",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "value",
+              "displayName": "value",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "gasLimit",
+              "displayName": "gasLimit",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "number",
+              "removed": false
+            },
+            {
+              "id": "maxFeePerGas",
+              "displayName": "maxFeePerGas",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "number",
+              "removed": false
+            },
+            {
+              "id": "maxPriorityFeePerGas",
+              "displayName": "maxPriorityFeePerGas",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "number",
+              "removed": false
+            },
+            {
+              "id": "type",
+              "displayName": "type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "number"
+            },
+            {
+              "id": "nonce",
+              "displayName": "nonce",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "number",
+              "removed": false
             }
           ],
-          "attemptToConvertTypes": false,
+          "attemptToConvertTypes": true,
           "convertFieldsToString": true
         },
         "mode": "each",
-        "options": {
-          "waitForSubWorkflow": true
-        }
+        "options": {}
       },
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1.2,
       "position": [
-        440,
-        -20
+        1760,
+        55
       ],
-      "id": "0c002a42-71ee-40db-8c62-069b60320476",
-      "name": "Get privy wallet data"
-    },
-    {
-      "parameters": {
-        "mode": "combine",
-        "combineBy": "combineByPosition",
-        "options": {}
-      },
-      "type": "n8n-nodes-base.merge",
-      "typeVersion": 3,
-      "position": [
-        660,
-        115
-      ],
-      "id": "fb5620c1-e384-4864-bad0-09cd11c10f63",
-      "name": "Merge"
+      "id": "8a6ad14c-cd60-4135-a216-b1ca5c1545ff",
+      "name": "Send create tx"
     }
   ],
   "connections": {
@@ -283,18 +444,7 @@
       "main": [
         [
           {
-            "node": "Prepare transaction",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Prepare transaction": {
-      "main": [
-        [
-          {
-            "node": "Send transaction",
+            "node": "Prepare deposit tx",
             "type": "main",
             "index": 0
           }
@@ -338,6 +488,39 @@
           }
         ]
       ]
+    },
+    "Prepare create tx": {
+      "main": [
+        [
+          {
+            "node": "Send create tx",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare deposit tx": {
+      "main": [
+        [
+          {
+            "node": "Send deposit tx",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send deposit tx": {
+      "main": [
+        [
+          {
+            "node": "Prepare create tx",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "settings": {
@@ -352,8 +535,8 @@
           "userId": "cm8k7kgle005mday68m1l2zlz",
           "name": "Test 1742647546585",
           "details": "Adipisci eveniet voluptatem sed. Molestias nemo odio dicta corporis corrupti iusto optio. Voluptas vero repellendus aut qui vel asperiores nihil. Aut non ut autem magni dolores voluptatum consequatur sunt.  Ipsam dignissimos necessitatibus id cum. Autem quaerat occaecati impedit. Sequi explicabo doloremque corporis et enim et. Id voluptatem fugit reprehenderit et ut quasi dolore. Aliquid itaque et impedit.  Doloribus natus ad architecto sapiente dignissimos et. Voluptas beatae minima quae. Dicta dolorem ex laborum eius vitae at quam.  Sapiente ducimus ut voluptatem eos cumque ab. Qui exercitationem quia ducimus tempore perspiciatis autem aut. Sed ea id architecto voluptas esse sunt. Numquam consequatur non et suscipit quibusdam autem. Totam eaque molestiae laboriosam explicabo quibusdam quas fuga. Et nobis qui ut.  Deserunt sed maiores vel. Repudiandae ut magnam eius voluptates culpa sunt. Quia ad iusto qui deleniti. Magni qui doloremque ducimus. Perferendis nam consequuntur amet ratione. Vel error aut amet necessitatibus animi est natus.",
-          "reward": 2,
-          "penalty": 5,
+          "reward": 200,
+          "penalty": 500,
           "deadline": 1743252346
         }
       }
@@ -368,7 +551,7 @@
       }
     ]
   },
-  "versionId": "2f7e591b-71a7-418f-9f22-074e6057f6f6",
+  "versionId": "5fd742ea-9273-4173-8c43-745dd038cd10",
   "triggerCount": 0,
   "tags": []
 }

@@ -1,6 +1,6 @@
 {
   "createdAt": "2025-03-22T09:27:27.254Z",
-  "updatedAt": "2025-03-22T12:42:45.000Z",
+  "updatedAt": "2025-03-22T18:50:13.000Z",
   "id": "ufVKn88RUKasYLuV",
   "name": "Privy: Send transaction",
   "active": false,
@@ -52,7 +52,8 @@
               "name": "data"
             },
             {
-              "name": "value"
+              "name": "value",
+              "type": "number"
             },
             {
               "name": "gasLimit",
@@ -118,7 +119,7 @@
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={{JSON.stringify({\n  //method: 'eth_signTransaction',\n  method: 'eth_sendTransaction',\n  caip2: `eip155:${$env.MULTIBAAS_CHAIN_ID}`,\n  chain_type: 'ethereum',\n  params: {\n    transaction: {\n      to: $json.to,\n      value: $json.value,\n      chain_id: $env.MULTIBAAS_CHAIN_ID,\n      data: $json.data,\n      gas: $json.gasLimit,\n      nonce: $json.nonce,\n      max_fee_per_gas: $json.maxFeePerGas,\n      max_priority_fee_per_gas: $json.maxPriorityFeePerGas,\n    }\n  }\n})}}",
+        "jsonBody": "={{JSON.stringify({\n  //method: 'eth_signTransaction',\n  method: 'eth_sendTransaction',\n  caip2: `eip155:${$env.MULTIBAAS_CHAIN_ID}`,\n  chain_type: 'ethereum',\n  params: {\n    transaction: {\n      to: $json.to,\n      value: $json.value,\n      //chain_id: $env.MULTIBAAS_CHAIN_ID,\n      data: $json.data,\n      gas: $json.gasLimit,\n      nonce: $json.nonce,\n      max_fee_per_gas: $json.maxFeePerGas,\n      max_priority_fee_per_gas: $json.maxPriorityFeePerGas,\n    }\n  }\n})}}",
         "options": {}
       },
       "type": "n8n-nodes-base.httpRequest",
@@ -165,8 +166,24 @@
   },
   "staticData": null,
   "meta": null,
-  "pinData": {},
-  "versionId": "5bc952b9-73de-49d7-b069-4dfeeeb9b0ae",
+  "pinData": {
+    "When Executed by Another Workflow": [
+      {
+        "json": {
+          "walletId": "iaauf9qrpkjlb2gr1s60p8v6",
+          "to": "0x3aBa78ac70F68B20729BcbE0888a030814A5795B",
+          "data": "0x095ea7b3000000000000000000000000901496dde072872e0dcaf22eb9f8164350bbbb8b000000000000000000000000000000000000000000000000000000000bebc200",
+          "value": 0,
+          "gasLimit": 46316,
+          "maxFeePerGas": 2000000008,
+          "maxPriorityFeePerGas": 1999999992,
+          "type": 2,
+          "nonce": 0
+        }
+      }
+    ]
+  },
+  "versionId": "142506d7-40ac-4121-be05-cfdb11e3e95c",
   "triggerCount": 0,
   "tags": []
 }
