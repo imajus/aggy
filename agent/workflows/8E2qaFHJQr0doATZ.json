@@ -1,6 +1,6 @@
 {
   "createdAt": "2025-03-22T07:28:23.524Z",
-  "updatedAt": "2025-03-22T18:47:32.000Z",
+  "updatedAt": "2025-03-23T05:20:17.000Z",
   "id": "8E2qaFHJQr0doATZ",
   "name": "MultiBaaS + Privy: Create Task",
   "active": false,
@@ -8,13 +8,13 @@
     {
       "parameters": {
         "action": "generate",
-        "dataPropertyName": "id"
+        "dataPropertyName": "taskId"
       },
       "type": "n8n-nodes-base.crypto",
       "typeVersion": 1,
       "position": [
         880,
-        55
+        -305
       ],
       "id": "e8f4814b-216a-4b15-9493-6692654020ab",
       "name": "Generate ID"
@@ -51,7 +51,7 @@
       "typeVersion": 1.1,
       "position": [
         220,
-        55
+        -305
       ],
       "id": "c7b1bb36-0ed4-417e-a350-292478779be0",
       "name": "When Executed by Another Workflow"
@@ -96,7 +96,7 @@
       "typeVersion": 1.2,
       "position": [
         440,
-        -20
+        -420
       ],
       "id": "0c002a42-71ee-40db-8c62-069b60320476",
       "name": "Get privy wallet data"
@@ -111,7 +111,7 @@
       "typeVersion": 3,
       "position": [
         660,
-        55
+        -305
       ],
       "id": "fb5620c1-e384-4864-bad0-09cd11c10f63",
       "name": "Merge"
@@ -127,7 +127,7 @@
           "parameters": [
             {
               "name": "args",
-              "value": "={{ [$json.address, $json.reward] }}"
+              "value": "={{ [$json.coreAddress, $json.reward] }}"
             },
             {
               "name": "from",
@@ -140,8 +140,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        1100,
-        55
+        1760,
+        -420
       ],
       "id": "0c8e8cae-8c39-41d1-b925-1444f5621fd6",
       "name": "Prepare deposit tx",
@@ -163,7 +163,7 @@
           "parameters": [
             {
               "name": "args",
-              "value": "={{ [[$json.name, $json.id, $json.details, $json.reward, $json.penalty, $json.deadline]] }}"
+              "value": "={{ [[$json.name, $json.taskId, $json.details, $json.reward, $json.penalty, $json.deadline]] }}"
             },
             {
               "name": "from",
@@ -176,8 +176,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        1540,
-        55
+        2420,
+        -305
       ],
       "id": "c5657715-9f79-4cf2-9af2-dcea84676f1d",
       "name": "Prepare create tx",
@@ -207,7 +207,7 @@
             "maxPriorityFeePerGas": "={{ $json.result.tx.gasTipCap }}",
             "maxFeePerGas": "={{ $json.result.tx.gasFeeCap }}",
             "gasLimit": "={{ $json.result.tx.gas }}",
-            "walletId": "={{ $('Generate ID').item.json.walletId }}"
+            "walletId": "={{ $('Get privy wallet data').item.json.walletId }}"
           },
           "matchingColumns": [],
           "schema": [
@@ -246,7 +246,7 @@
               "defaultMatch": false,
               "display": true,
               "canBeUsedToMatch": true,
-              "type": "string"
+              "type": "number"
             },
             {
               "id": "gasLimit",
@@ -307,8 +307,8 @@
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1.2,
       "position": [
-        1320,
-        55
+        1980,
+        -420
       ],
       "id": "ceca6895-c79a-4d7d-acc3-099abcda5c2d",
       "name": "Send deposit tx"
@@ -332,7 +332,7 @@
             "maxPriorityFeePerGas": "={{ $json.result.tx.gasTipCap }}",
             "maxFeePerGas": "={{ $json.result.tx.gasFeeCap }}",
             "gasLimit": "={{ $json.result.tx.gas }}",
-            "walletId": "={{ $('Generate ID').item.json.walletId }}"
+            "walletId": "={{ $('Get privy wallet data').item.json.walletId }}"
           },
           "matchingColumns": [],
           "schema": [
@@ -371,7 +371,7 @@
               "defaultMatch": false,
               "display": true,
               "canBeUsedToMatch": true,
-              "type": "string"
+              "type": "number"
             },
             {
               "id": "gasLimit",
@@ -432,11 +432,100 @@
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1.2,
       "position": [
-        1760,
-        55
+        2640,
+        -305
       ],
       "id": "8a6ad14c-cd60-4135-a216-b1ca5c1545ff",
       "name": "Send create tx"
+    },
+    {
+      "parameters": {
+        "mode": "chooseBranch",
+        "useDataOfInput": 2
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [
+        2200,
+        -305
+      ],
+      "id": "87ec470c-ee8b-4cc1-8cdf-4a68996b0753",
+      "name": "Merge1"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={{ JSON.stringify($('Merge1').item.json) }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2860,
+        -305
+      ],
+      "id": "66088026-3cbd-433e-bdd4-87901765e58e",
+      "name": "Export data"
+    },
+    {
+      "parameters": {
+        "url": "={{ $env.MULTIBAAS_URL }}/addresses/aggy_core",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1100,
+        -200
+      ],
+      "id": "0341089c-b66a-4bbe-9d4a-833e4cf0b6e9",
+      "name": "Get AggyCore address",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "Kcme09pJN7p2gcFw",
+          "name": "MultiBaaS account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [
+        1540,
+        -420
+      ],
+      "id": "e20078eb-9ceb-4eac-b8ed-269f95004bb6",
+      "name": "Merge2"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "536b597c-230b-44d3-be73-42a7e1dfd5f6",
+              "name": "coreAddress",
+              "value": "={{ $json.result.address }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1320,
+        -200
+      ],
+      "id": "ed3eb2ed-2235-4980-8201-5a07c39f71f5",
+      "name": "Pick address only"
     }
   ],
   "connections": {
@@ -444,7 +533,17 @@
       "main": [
         [
           {
-            "node": "Prepare deposit tx",
+            "node": "Merge1",
+            "type": "main",
+            "index": 1
+          },
+          {
+            "node": "Get AggyCore address",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge2",
             "type": "main",
             "index": 0
           }
@@ -515,9 +614,64 @@
       "main": [
         [
           {
+            "node": "Merge1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge1": {
+      "main": [
+        [
+          {
             "node": "Prepare create tx",
             "type": "main",
             "index": 0
+          }
+        ]
+      ]
+    },
+    "Send create tx": {
+      "main": [
+        [
+          {
+            "node": "Export data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get AggyCore address": {
+      "main": [
+        [
+          {
+            "node": "Pick address only",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge2": {
+      "main": [
+        [
+          {
+            "node": "Prepare deposit tx",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pick address only": {
+      "main": [
+        [
+          {
+            "node": "Merge2",
+            "type": "main",
+            "index": 1
           }
         ]
       ]
@@ -551,7 +705,7 @@
       }
     ]
   },
-  "versionId": "5fd742ea-9273-4173-8c43-745dd038cd10",
+  "versionId": "5dd935a4-bacd-41f6-bdc7-21ad5385fcdd",
   "triggerCount": 0,
   "tags": []
 }

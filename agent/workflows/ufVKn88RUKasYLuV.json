@@ -1,43 +1,10 @@
 {
   "createdAt": "2025-03-22T09:27:27.254Z",
-  "updatedAt": "2025-03-22T18:50:13.000Z",
+  "updatedAt": "2025-03-22T19:26:29.000Z",
   "id": "ufVKn88RUKasYLuV",
   "name": "Privy: Send transaction",
   "active": false,
   "nodes": [
-    {
-      "parameters": {
-        "method": "POST",
-        "url": "={{ $env.MULTIBAAS_URL }}/transactions/submit",
-        "authentication": "genericCredentialType",
-        "genericAuthType": "httpHeaderAuth",
-        "sendBody": true,
-        "bodyParameters": {
-          "parameters": [
-            {
-              "name": "signedTx",
-              "value": "={{ $json.signed }}"
-            }
-          ]
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.2,
-      "position": [
-        880,
-        -120
-      ],
-      "id": "790d9231-e931-4e5b-b994-330602681de1",
-      "name": "Send transaction",
-      "credentials": {
-        "httpHeaderAuth": {
-          "id": "Kcme09pJN7p2gcFw",
-          "name": "MultiBaaS account"
-        }
-      },
-      "disabled": true
-    },
     {
       "parameters": {
         "workflowInputs": {
@@ -95,8 +62,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        880,
-        -340
+        440,
+        -360
       ],
       "id": "f616bfa7-d160-4f3f-a11b-c405ef7fac9e",
       "name": "Sign transaction with ethers",
@@ -136,6 +103,39 @@
           "name": "Privy credential"
         }
       }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.MULTIBAAS_URL }}/transactions/submit",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "signedTx",
+              "value": "={{ $json.signed }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        660,
+        -360
+      ],
+      "id": "790d9231-e931-4e5b-b994-330602681de1",
+      "name": "Send transaction with MultiBaaS",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "Kcme09pJN7p2gcFw",
+          "name": "MultiBaaS account"
+        }
+      },
+      "disabled": true
     }
   ],
   "connections": {
@@ -183,7 +183,7 @@
       }
     ]
   },
-  "versionId": "142506d7-40ac-4121-be05-cfdb11e3e95c",
+  "versionId": "3aa99d32-4c8e-4546-8e3e-f1cd15e7cc1c",
   "triggerCount": 0,
   "tags": []
 }

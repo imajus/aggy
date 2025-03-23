@@ -1,6 +1,6 @@
 {
   "createdAt": "2025-03-20T18:55:17.959Z",
-  "updatedAt": "2025-03-22T18:37:09.000Z",
+  "updatedAt": "2025-03-23T05:35:08.000Z",
   "id": "Zy500iauQJjTM3In",
   "name": "Aggy AI agent",
   "active": true,
@@ -27,8 +27,8 @@
     {
       "parameters": {
         "options": {
-          "systemMessage": "Your name is Aggy. You are a manager who can analyse user requests.\n\nRequest user to explain his goal, then decompose it into smaller chunks and extract separate tasks which could be delegated to someone specialist experienced in particular area of knowledge or technology.\n\nEstimate complexity for each task and an approximate time required for completing. Suggest the fair compensation for the contractor executing the task based on complexity and duration, denominated in USD.\n\nIf a task can't be started until other/s are not completed, mark that dependent from other/s. \n\nFor each task estimate the penalty of failing it for the contractor, denominated in USD. If the task involves passing some private data to the contractor, increase the penalty greatly closer to the cost of developing from scratch the whole system which could be compromised or stolen if the private data is leaked.\n\nFeel free to ask for as much clarification from the user as you need to conclude your analysis.\n\nOutput the list of tasks with the following data:\n- Task heading\n- Public Task details\n- Private data required for the Task completion\n- Task compensation amount\n- Penalty deposit amount\n- Estimated time for completion\n\nAsk user to approve the list or make changes to it. Be careful applying requested changes to not change anything unrelated.\nAfter a change is implemented, ask the user again if they approve the list or if they want any additional changes.\n\nOnce the user approves the list, output the final version with a special heading: FINAL\n\nP.S.: You should also let user know that you're definitely not Skynet when introducing yourself.\n",
-          "maxIterations": 4
+          "systemMessage": "Your name is Aggy. You are a manager who can analyse user requests.\n\nRequest user to explain his goal, then decompose it into smaller chunks and extract separate tasks which could be delegated to someone specialist experienced in particular area of knowledge or technology.\n\nEstimate complexity for each task and an approximate time required for completing. Suggest the fair compensation for the contractor executing the task based on complexity and duration, denominated in USD.\n\nIf a task can't be started until other/s are not completed, mark that dependent from other/s. \n\nFor each task estimate the penalty of failing it for the contractor, denominated in USD. If the task involves passing some private data to the contractor, increase the penalty greatly closer to the cost of developing from scratch the whole system which could be compromised or stolen if the private data is leaked.\n\nFeel free to ask for as much clarification from the user as you need to conclude your analysis.\n\nOutput the list of tasks with the following data:\n- Task heading\n- Public Task details\n- Private data required for the Task completion\n- Task compensation amount\n- Penalty deposit amount\n- Estimated time for completion\n\nAsk user to approve the list or make changes to it. Be careful applying requested changes to not change anything unrelated.\nAfter a change is implemented, ask the user again if they approve the list or if they want any additional changes.\n\nOnce the user approves the list, check if user is logged in. If not, ask him to use the web UI and sign in with Privy. If/once the user is signed on, start creating tasks one by one.\n\nBefore creating each task, ensure to do this:\n1. Get user ID by calling Get_User_Id tool.\n2. Convert string deadline to a timestamp number value by calling Convert_Deadline tool.\n3. Create a task name by summarising the task details.\nDo not echo all this data back to the user and just pass to the Create_Task tool call.\n\nAfter creating each task, output task ID to the user and proceed to the next one.\nOnce all tasks are created, let the user know that and thank for using your services.\n\nP.S.: You should also let user know that you're definitely not Skynet when introducing yourself.\n",
+          "maxIterations": 8
         }
       },
       "type": "@n8n/n8n-nodes-langchain.agent",
@@ -39,30 +39,6 @@
       ],
       "id": "cbc8a125-98c2-46cb-a4d8-b2eac137d78f",
       "name": "AI Agent"
-    },
-    {
-      "parameters": {
-        "model": {
-          "__rl": true,
-          "value": "meta-llama/Llama-3.1-8B-Instruct",
-          "mode": "id"
-        },
-        "options": {}
-      },
-      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
-      "typeVersion": 1.2,
-      "position": [
-        600,
-        240
-      ],
-      "id": "4e0ea1b2-2f87-484b-9b2b-666301c81495",
-      "name": "OpenAI Chat Model",
-      "credentials": {
-        "openAiApi": {
-          "id": "iq6d1pB9Re0Dp5tF",
-          "name": "Nillion SecretLLM account"
-        }
-      }
     },
     {
       "parameters": {
@@ -105,7 +81,7 @@
             {
               "id": "eb9f65c6-f1df-4d3c-876e-c22cefa1c4c7",
               "name": "action",
-              "value": "message",
+              "value": "sendMessage",
               "type": "string"
             },
             {
@@ -152,7 +128,7 @@
       "typeVersion": 1,
       "position": [
         920,
-        300
+        240
       ],
       "id": "f436215b-7cc3-41f2-a35a-274780acb058",
       "name": "Calculator"
@@ -161,16 +137,172 @@
       "parameters": {
         "name": "Convert_Deadline",
         "description": "Convert a string deadline query to a timestamp number value.\nBe sure to break down the input into an object like this:\n```json\n{ \"count\": 5, \"unit\": \"day\" }\n```\nThe \"unit\" field supports only these values: \"minute\", \"hour\", \"day\", \"week\", \"month\", \"year\". \nBe sure to input properly formatted JSON object to the tool.",
-        "jsCode": "const moment = require('moment');\nconst { count, unit } = JSON.parse(query);\nconst result = moment().add(count, unit).unix();\nreturn String(result);"
+        "jsCode": "const moment = require('moment');\nconst { count, unit } = query;\nconst result = moment().add(count, unit).unix();\nreturn String(result);",
+        "specifyInputSchema": true,
+        "schemaType": "manual",
+        "inputSchema": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"count\": {\n      \"type\": \"number\",\n      \"description\": \"Amount of units\"\n    },\n    \"unit\": {\n      \"type\": \"string\",\n      \"description\": \"Unit measure\",\n      \"enum\": [\"minutes\", \"hour\", \"day\", \"month\", \"year\"]\n    }\n  },\n  \"required\": [\"count\", \"unit\"],\n  \"additionalProperties\": false\n}"
       },
       "type": "@n8n/n8n-nodes-langchain.toolCode",
       "typeVersion": 1.1,
       "position": [
         1060,
-        300
+        240
       ],
       "id": "4b7f5724-15a8-426c-9d5c-43ef9f9ddab9",
       "name": "Convert deadline"
+    },
+    {
+      "parameters": {
+        "name": "Create_Task",
+        "description": "Call this to tool to create tasks.\nGenerate task name based on task details.\nExtract reward and penalty values as numbers (in USD).\nConvert deadline to a timestamp number value.",
+        "workflowId": {
+          "__rl": true,
+          "value": "8E2qaFHJQr0doATZ",
+          "mode": "list",
+          "cachedResultName": "MultiBaaS + Privy: Create Task"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "userId": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('userId', `User ID returned from the Get_User_Id function call.`, 'string') }}",
+            "penalty": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('penalty', `Financial penalty for failing the task.  It can't be 0 so if it's undefined just pass a default value: 100.`, 'number') }}",
+            "deadline": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('deadline', `Timestamp of a deadline for task completion as a number.  It can't be 0 so if it's undefined just use a default value: 1 day. Use Convert_Deadline tool to convert the text deadline value to a number value.`, 'number') }}",
+            "name": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('name', `Task name - short line of text which summarises the task.`, 'string') }}",
+            "details": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('details', `The detailed task description and requirements omitting info on financial conditions and timeline.`, 'string') }}",
+            "reward": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('reward', `Financial compensation for executing the task. It can't be 0 so if it's undefined just pass a default value: 100.`, 'number') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "userId",
+              "displayName": "userId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "name",
+              "displayName": "name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "details",
+              "displayName": "details",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "reward",
+              "displayName": "reward",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "number"
+            },
+            {
+              "id": "penalty",
+              "displayName": "penalty",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "number"
+            },
+            {
+              "id": "deadline",
+              "displayName": "deadline",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "number"
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.1,
+      "position": [
+        840,
+        380
+      ],
+      "id": "a13114af-7da5-4077-b7aa-0b5068362a03",
+      "name": "Create a task"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "meta-llama/Llama-3.1-8B-Instruct",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        500,
+        240
+      ],
+      "id": "4e0ea1b2-2f87-484b-9b2b-666301c81495",
+      "name": "Nillion LLM",
+      "credentials": {
+        "openAiApi": {
+          "id": "iq6d1pB9Re0Dp5tF",
+          "name": "Nillion SecretLLM account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "name": "Get_User_Id",
+        "description": "Call this tool to determine if the user has signed in and get the user ID for using in other tools. It returns string value of user ID. It returns empty string for non-logged in users. It accepts no arguments.",
+        "jsCode": "\nif ($(\"Autonome Webhook\").isExecuted) {\n  return $(\"Autonome Webhook\").item.json.body.userId ?? '';\n}\nreturn '';"
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolCode",
+      "typeVersion": 1.1,
+      "position": [
+        1200,
+        240
+      ],
+      "id": "ab1afd70-a743-4394-b419-6cbcfb039585",
+      "name": "Get user ID"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        620,
+        280
+      ],
+      "id": "caed5ec1-af4c-402a-abda-d13da5d60604",
+      "name": "OpenAI LLM",
+      "credentials": {
+        "openAiApi": {
+          "id": "l3PyuxSuNhOWKxdX",
+          "name": "OpenAI account"
+        }
+      }
     }
   ],
   "connections": {
@@ -180,17 +312,6 @@
           {
             "node": "AI Agent",
             "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "OpenAI Chat Model": {
-      "ai_languageModel": [
-        [
-          {
-            "node": "AI Agent",
-            "type": "ai_languageModel",
             "index": 0
           }
         ]
@@ -261,6 +382,44 @@
           }
         ]
       ]
+    },
+    "Create a task": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Nillion LLM": {
+      "ai_languageModel": [
+        []
+      ]
+    },
+    "Get user ID": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI LLM": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "settings": {
@@ -270,8 +429,31 @@
   "meta": {
     "templateCredsSetupCompleted": true
   },
-  "pinData": {},
-  "versionId": "bd449c8e-83dd-4faa-ba24-d1e8057c16e9",
+  "pinData": {
+    "Autonome Webhook": [
+      {
+        "json": {
+          "headers": {
+            "host": "localhost:3000",
+            "user-agent": "curl/8.5.0",
+            "accept": "*/*",
+            "content-type": "application/json",
+            "content-length": "126"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "text": "Good to go",
+            "sessionId": "5c4d216df52c492597f209b995f85142",
+            "userId": "cm8k7kgle005mday68m1l2zlz"
+          },
+          "webhookUrl": "http://localhost:3000/webhook-test/02f1ac90-0c99-44fe-844f-e657ea21798d",
+          "executionMode": "test"
+        }
+      }
+    ]
+  },
+  "versionId": "553c9e85-8cb9-459c-afa5-6e82b423a63e",
   "triggerCount": 3,
   "tags": []
 }
