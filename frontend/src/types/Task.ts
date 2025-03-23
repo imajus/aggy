@@ -22,8 +22,11 @@ export interface TaskData {
   export enum TaskStatus {
     CREATED = 0,
     IN_PROGRESS = 1,
-    SUBMITTED = 2,
-    COMPLETED = 3,
+    PENDING_REVIEW = 2,
+    UNDER_REVIEW = 3,
+    CONFIRMED = 4,
+    FAILED = 5,
+    CANCELLED = 6,
   }
 
   export const stringToTaskStatus = (status: string) => {
@@ -31,18 +34,22 @@ export interface TaskData {
   }
 
 
-  export const getStatusText = (status: number) => {
+  export const getStatusText = (status: TaskStatus) => {
     switch (status) {
-      case 0:
+      case TaskStatus.CREATED:
         return 'Created';
-      case 1:
+      case TaskStatus.IN_PROGRESS:
         return 'In Progress';
-      case 2:
-        return 'Submitted';
-      case 3:
-        return 'Completed';
-      default:
-        return 'Unknown';
+      case TaskStatus.PENDING_REVIEW:
+        return 'Pending Review';
+      case TaskStatus.UNDER_REVIEW:
+        return 'Under Review';
+      case TaskStatus.CONFIRMED:
+        return 'Confirmed';
+      case TaskStatus.FAILED:
+        return 'Failed';
+      case TaskStatus.CANCELLED:
+        return 'Cancelled';
     }
   };
 
