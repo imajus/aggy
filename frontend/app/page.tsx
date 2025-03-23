@@ -1,3 +1,5 @@
+import { LoginWalletButton } from "@/components/LoginWalletButton";
+
 export default function LandingPage() {
   return (
     <div className="max-w-2xl mx-auto">
@@ -8,11 +10,12 @@ export default function LandingPage() {
           powered by Ethereum and USDC.
         </p>
         <p className="text-[#4A5568]">
-          Get started by{" "}
+          Get started by connecting your wallet and{" "}
           <span className="text-[#2B6CB0] font-medium">submitting a job request</span>{" "}
           or exploring the{" "}
           <span className="text-[#2B6CB0] font-medium">task board</span>.
         </p>
+        <LoginWalletButton />
       </div>
     </div>
   );

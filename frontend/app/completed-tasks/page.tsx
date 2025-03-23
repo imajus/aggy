@@ -5,7 +5,7 @@ import { useTasks } from "@/hooks/UseTasksHook";
 import { TaskStatus } from "@/types/Task";
 
 export default function CompletedTasksPage() {
-  const { data: tasks, isLoading, error } = useTasks(TaskStatus.COMPLETED);
+  const { data: tasks, isLoading, error } = useTasks(TaskStatus.CONFIRMED);
 
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>Error loading tasks</div>;
