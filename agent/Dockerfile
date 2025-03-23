@@ -12,6 +12,7 @@ RUN n8n import:credentials --separate --input=.n8n/backup/credentials
 RUN n8n import:workflow --separate --input=.n8n/backup/workflows
 # Activate all workflows
 RUN n8n update:workflow --id=Zy500iauQJjTM3In --active=true
+RUN n8n update:workflow --id=iiEWQuPdY1KZKLol --active=true
 # Allow passing custom encryption key
 RUN rm .n8n/config
 # Init environment variable defaults

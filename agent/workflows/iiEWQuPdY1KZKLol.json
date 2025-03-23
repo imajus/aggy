@@ -1,9 +1,9 @@
 {
   "createdAt": "2025-03-23T06:04:43.636Z",
-  "updatedAt": "2025-03-23T06:22:00.000Z",
+  "updatedAt": "2025-03-23T06:31:02.000Z",
   "id": "iiEWQuPdY1KZKLol",
   "name": "Aggy: Get Task private data",
-  "active": false,
+  "active": true,
   "nodes": [
     {
       "parameters": {
@@ -280,6 +280,6 @@
     ]
   },
   "versionId": "aa9cedb1-6138-4e68-b002-d5e0c43ebef7",
-  "triggerCount": 0,
+  "triggerCount": 1,
   "tags": []
 }
