@@ -122,3 +122,18 @@ export async function getCoreAddress() {
     const result = await resp.json();
     return result?.data;
   }
+
+  export async function sendChatMessage(userId: string | undefined, sessionId: string, text: string) {
+    const resp = await fetch(
+      `${process.env.NEXT_PUBLIC_AGENT_URL}/webhook/02f1ac90-0c99-44fe-844f-e657ea21798d`,
+      {
+        method: 'POST',
+        body: JSON.stringify({ userId, sessionId, text }),
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      }
+    );
+    const result = await resp.json();
+    return result.text;
+  }

@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
-      <body className="bg-[#F7FAFC] text-[#2D3748]">
+      <body className="bg-[#F7FAFC] text-[#3173E2]">
         <Providers>
           {/* The AuthGuard decides whether to show the LandingPage or the main UI */}
           <AuthGuard>

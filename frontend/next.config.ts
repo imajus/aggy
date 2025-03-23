@@ -1,7 +1,5 @@
 import type { NextConfig } from "next";
 
-console.log(process.env);
-
 const nextConfig: NextConfig = {
   allowedDevOrigins: ['http://localhost:3000', '55f7f999cbc2.ngrok.app', 'ade81fa24198.ngrok.app'],
   env: {

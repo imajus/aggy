@@ -25,7 +25,7 @@ module.exports = {
           sidebar: "#EDF2F7",
         },
         text: {
-          primary: "#2D3748",
+          primary: "3173E2",
           secondary: "#4A5568",
           light: "#676FFF",
         },

@@ -3,9 +3,9 @@ import { LoginWalletButton } from "@/components/LoginWalletButton";
 export default function LandingPage() {
   return (
     <div className="max-w-2xl mx-auto">
-      <h1 className="text-3xl font-bold mb-6 text-[#2D3748]">Welcome to Aggy</h1>
+      <h1 className="text-3xl font-bold mb-6 text-[#3173E2]">Welcome to Aggy</h1>
       <div className="space-y-4">
-        <p className="text-lg text-[#2D3748]">
+        <p className="text-lg text-[#3173E2]">
           Aggy is a decentralized platform for hiring and freelancing services,
           powered by Ethereum and USDC.
         </p>
