@@ -1,15 +1,17 @@
+import { getBalanceOf } from '@/lib/api';
 import { useEffect, useState } from 'react';
 import { createPublicClient, http } from 'viem';
 import { mainnet } from 'viem/chains';
-import useAggyContract from "@/hooks/UseAggyContracts";
+// import useAggyContract from "@/hooks/UseAggyContracts";
 
 export default function AggyBalanceDisplay() {
-    const { getAggyToken } = useAggyContract();
-    const tokenAddress = getAggyToken();
-    const [balance, setBalance] = useState<number | null>(null);
+    // const { getAggyToken } = useAggyContract();
+    // const tokenAddress = getAggyToken();
+    const tokenAddress = '0x8926c8efd17a73771f51c68dD8adb95F61B5fa32';
+    const [balance, setBalance] = useState<number | null>(0.00);
 
     useEffect(() => {
-        if (!tokenAddress) return;
+        // if (!tokenAddress) return;
 
         const client = createPublicClient({
             chain: mainnet,
@@ -18,9 +20,10 @@ export default function AggyBalanceDisplay() {
 
         async function fetchBalance() {
             try {
-                const balance = await client.getBalance({
-                    address: tokenAddress as unknown as `0x${string}` || '0x8926c8efd17a73771f51c68dD8adb95F61B5fa32',
-                });
+                const balance = await getBalanceOf(tokenAddress);
+                // await client.getBalance({
+                //     address: tokenAddress as unknown as `0x${string}` || '0x8926c8efd17a73771f51c68dD8adb95F61B5fa32',
+                // });
                 setBalance(Number(balance));
             } catch (error) {
                 console.error('Error fetching balance:', error);

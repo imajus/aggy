@@ -2,7 +2,7 @@
 
 import { useCallback, useState } from "react";
 import { useWallets, useSendTransaction, usePrivy } from "@privy-io/react-auth";
-import { approveToken, claimTask, fetchTaskPrivateData } from "@/lib/api"; 
+import { approveToken, claimTask, fetchTaskPrivateData } from "@/lib/api";
 // ↑ Adjust import path to wherever your API functions are located
 
 /**
@@ -15,7 +15,7 @@ import { approveToken, claimTask, fetchTaskPrivateData } from "@/lib/api";
 export function useClaimTask() {
   const { wallets } = useWallets();
   const { user } = usePrivy(); // if you need user.id
-  const { isSending, sendTransaction } = useSendTransaction();
+  const { sendTransaction } = useSendTransaction();
   const [error, setError] = useState<Error | null>(null);
   const [privateData, setPrivateData] = useState<any>(null);
 
@@ -34,19 +34,19 @@ export function useClaimTask() {
       try {
         // 1) Approve token spending for stakeAmount
         //    (Or pass a fixed number if your contract expects a certain penalty, etc.)
-        const approveTx = await approveToken(wallet.address, stakeAmount);
+        const approveTx = await approveToken(wallet.address, stakeAmount.toString());
 
         // 2) We typically want to sign & send the approveTx as well
         //    If your contract requires a separate TX for approving, do it here:
         await sendTransaction({
           to: approveTx.to,
-          chain_id: process.env.NEXT_PUBLIC_MULTIBAAS_CHAIN_ID,
+          chainId: process.env.NEXT_PUBLIC_MULTIBAAS_CHAIN_ID as unknown as number || 84532,
           nonce: approveTx.nonce ?? 0,
           data: approveTx.data,
           value: approveTx.value,
           type: approveTx.type,
-          gas_limit: approveTx.gasFeeCap,
-          gas_price: approveTx.gasTipCap,
+          gasLimit: approveTx.gasFeeCap,
+          gasPrice: approveTx.gasTipCap,
         });
 
         // 3) Now call claimTask => returns a TX to sign
@@ -55,13 +55,13 @@ export function useClaimTask() {
         // 4) Sign & send the claim TX
         await sendTransaction({
           to: claimTx.to,
-          chain_id: process.env.NEXT_PUBLIC_MULTIBAAS_CHAIN_ID,
+          chainId: process.env.NEXT_PUBLIC_MULTIBAAS_CHAIN_ID as unknown as number || 84532,
           nonce: claimTx.nonce ?? 0,
           data: claimTx.data,
           value: claimTx.value,
           type: claimTx.type,
-          gas_limit: claimTx.gasFeeCap,
-          gas_price: claimTx.gasTipCap,
+          gasLimit: claimTx.gasFeeCap,
+          gasPrice: claimTx.gasTipCap,
         });
 
         // 5) (Optional) Once claimed, you may want to fetch private data
@@ -79,7 +79,6 @@ export function useClaimTask() {
 
   return {
     claim,
-    isSending,
     error,
     privateData,
   };

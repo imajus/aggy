@@ -6,7 +6,7 @@ import { getStatusText } from "@/types/Task";
 
 export default function TasksPage() {
   const { data: tasks, isLoading, error } = useTasks();
-  const { claim, isSending, error: claimError, privateData } = useClaimTask();
+  const { claim, error: claimError, privateData } = useClaimTask();
 
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>Error loading tasks</div>;
@@ -83,9 +83,8 @@ export default function TasksPage() {
               <button
                 className="mt-4 px-4 py-2 bg-blue-600 text-white rounded"
                 onClick={() => handleClaim(task)}
-                disabled={isSending}
               >
-                {isSending ? "Claiming..." : "Claim Task"}
+                Claim Task
               </button>
             )}
           </div>

@@ -1,4 +1,27 @@
-async function getCoreAddress() {
+
+import axios from 'axios';
+
+// Example function to fetch data with authorization
+export async function fetchData(endpoint: string) {
+  try {
+    const response = await axios.get(`${process.env.NEXT_PUBLIC_MULTIBAAS_URL}${endpoint}`, {
+      headers: {
+        Authorization: `Bearer ${process.env.NEXT_PUBLIC_MULTIBAAS_KEY}`, // Include the authorization token
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching data:', error);
+    throw error;
+  }
+}
+
+
+export async function getCoreAddress() {
+    console.log(process.env.NEXT_PUBLIC_MULTIBAAS_URL);
+    console.log(process.env.NEXT_PUBLIC_MULTIBAAS_KEY);
+
+
     const resp = await fetch(
       `${process.env.NEXT_PUBLIC_MULTIBAAS_URL}/addresses/aggy_core`,
       {
@@ -12,14 +35,15 @@ async function getCoreAddress() {
     return data.result.address;
   }
   
-  async function approveToken(from: string, amount: string) {
+  export async function approveToken(from: string, amount: string) {
     const resp = await fetch(
       `${process.env.NEXT_PUBLIC_MULTIBAAS_URL}/addresses/aggy_token/contracts/aggy_token/methods/approve`,
       {
         method: 'POST',
         body: JSON.stringify({
-           args: [await getCoreAddress()],
+           args: [await getCoreAddress(), amount],
            from,
+           value: amount,
         }),
         headers: {
           Authorization: `Bearer ${process.env.NEXT_PUBLIC_MULTIBAAS_KEY}`
@@ -29,8 +53,26 @@ async function getCoreAddress() {
     const data = await resp.json();
     return data.result.tx;
   }
+
+  export async function getBalanceOf(address: string) {
+    const resp = await fetch(
+      `${process.env.NEXT_PUBLIC_MULTIBAAS_URL}/addresses/aggy_token/contracts/aggy_token/methods/balanceOf`,
+      {
+        method: 'POST',
+        body: JSON.stringify({
+          args: [address],
+          from: address,
+        }),
+        headers: {
+          Authorization: `Bearer ${process.env.NEXT_PUBLIC_MULTIBAAS_KEY}`
+        }
+      }
+    );
+    const data = await resp.json();
+    return data.result.balance;
+  }
   
-  async function claimTask(from: string, taskId: string) {
+  export async function claimTask(from: string, taskId: string) {
     const resp = await fetch(
       `${process.env.NEXT_PUBLIC_MULTIBAAS_URL}/addresses/aggy_core/contracts/aggy_core/methods/claimTask`,
       {
@@ -48,7 +90,7 @@ async function getCoreAddress() {
     return data.result.tx;
   }
   
-  async function fetchTaskPrivateData(userId: string, taskId: string) {
+  export async function fetchTaskPrivateData(userId: string, taskId: string) {
     const resp = await fetch(
       `${process.env.NEXT_PUBLIC_AGENT_URL}/webhook/95010b94-c3b3-43ae-9c0d-c843568ac6ea`,
       {
