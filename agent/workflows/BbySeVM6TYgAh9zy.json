@@ -1,0 +1,106 @@
+{
+  "createdAt": "2025-03-23T08:08:09.619Z",
+  "updatedAt": "2025-03-23T10:01:19.000Z",
+  "id": "BbySeVM6TYgAh9zy",
+  "name": "MultiBaas: Get AI Agent prompt",
+  "active": false,
+  "nodes": [
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -20,
+        -180
+      ],
+      "id": "72e96273-7fc8-4daa-a21d-605e74e9af7c",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.MULTIBAAS_URL }}/addresses/aggy_core/contracts/aggy_core/methods/getCombinedInstructions",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        200,
+        -180
+      ],
+      "id": "f76feb88-2ffc-45c7-8768-457419684c86",
+      "name": "Get constraints",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "Kcme09pJN7p2gcFw",
+          "name": "MultiBaaS account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "2c393e09-d881-4e55-bd26-dfa25ec7bf76",
+              "name": "prompt",
+              "value": "={{ $json.result.output }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        420,
+        -180
+      ],
+      "id": "3c4331b3-ef1a-463c-a20e-3048878a6bb0",
+      "name": "Extract contraints"
+    }
+  ],
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Get constraints",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get constraints": {
+      "main": [
+        [
+          {
+            "node": "Extract contraints",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract contraints": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "cd2b511d-84a0-4a60-a2f2-d0353a3b00f6",
+  "triggerCount": 0,
+  "tags": []
+}
