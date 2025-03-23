@@ -87,7 +87,7 @@ export async function getCoreAddress() {
       }
     );
     const data = await resp.json();
-    return data.result.balance;
+    return data.result.output;
   }
   
   export async function claimTask(from: string, taskId: string) {

@@ -20,7 +20,7 @@ export default function ChatPage() {
   const { user } = usePrivy();
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
-  const sessionId = uuid();
+  const [sessionId] = useState(uuid());
 
   const sendMessage = () => {
     if (!input.trim()) return;
