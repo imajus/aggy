@@ -1,3 +1,5 @@
+"use client";
+
 import { useTasks } from "@/hooks/UseTasksHook";
 
 const getStatusText = (status: number) => {
@@ -30,7 +32,7 @@ export default function TasksPage() {
             key={task.data.id}
             className="border rounded-lg p-4 shadow-sm"
           >
-            <h2 className="text-xl font-semibold">{task.data.name}</h2>
+            <h2 className="text-gray-600 text-xl font-semibold">{task.data.name}</h2>
             <p className="text-gray-600 mt-2">{task.data.details}</p>
             <div className="mt-4 grid grid-cols-2 gap-4">
               <div>

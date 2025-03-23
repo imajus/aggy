@@ -1,5 +1,4 @@
 import { ButtonHTMLAttributes, ReactNode } from 'react';
-import { theme } from '@/styles/theme';
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'secondary' | 'outline';
