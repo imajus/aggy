@@ -25,9 +25,6 @@ export default function RootLayout({ children }: { children: ReactNode }) {
               <p className="text-xl font-bold text-[#2B6CB0]">Aggy Dapp</p>
             </div>
             <nav className="space-y-2">
-              <Link href="/submit" className="block p-2 text-[#4A5568] hover:bg-[#E2E8F0] rounded-md">
-                Submit Job
-              </Link>
               <Link href="/chat" className="block p-2 text-[#4A5568] hover:bg-[#E2E8F0] rounded-md">
                 Chat
               </Link>
