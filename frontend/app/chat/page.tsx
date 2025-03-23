@@ -25,15 +25,9 @@ export default function ChatPage() {
     // TODO: Send message to AI agent endpoint, get response, etc.
   };
 
-  const handlePostJob = () => {
-    // Suppose we've refined job details with the AI
-    // Now we can "post" it and redirect
-    router.push("/tasks");
-  };
-
   return (
     <div className="max-w-2xl mx-auto">
-      <h2 className="text-2xl font-bold mb-6 text-[#2D3748]">AI Refinement Chat</h2>
+      <h2 className="text-2xl font-bold mb-6 text-[#2D3748]">Talk to Aggy</h2>
       <Card className="mb-6 h-64 overflow-y-auto">
         {messages.map((msg, idx) => (
           <div key={idx} className="mb-4 last:mb-0">
@@ -59,12 +53,6 @@ export default function ChatPage() {
           onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
         />
         <Button onClick={sendMessage}>Send</Button>
-      </div>
-
-      <div className="mt-6">
-        <Button variant="secondary" onClick={handlePostJob}>
-          Post Job
-        </Button>
       </div>
     </div>
   );

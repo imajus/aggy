@@ -1,13 +1,18 @@
 import { fetchTasks } from '@/client/TaskClient';
-import { TaskData } from '@/types/Task';
+import { stringToTaskStatus, TaskData, TaskStatus } from '@/types/Task';
 import { useQuery } from '@tanstack/react-query';
 
-export const useTasks = () => {
+export const useTasks = (status?: TaskStatus) => {
   return useQuery<TaskData[]>({
-    queryKey: ['tasks'],
+    queryKey: ['tasks', status],
     queryFn: async () => {
       const response = await fetchTasks();
-      return response.result.output;
+      console.log(response.result.output);
+      if (!status) {
+        return response.result.output;
+      } else {
+        return response.result.output.filter((task) => task.state.status === status);
+      }
     },
   });
 };

@@ -1,21 +1,7 @@
 "use client";
 
 import { useTasks } from "@/hooks/UseTasksHook";
-
-const getStatusText = (status: number) => {
-  switch (status) {
-    case 0:
-      return 'Created';
-    case 1:
-      return 'In Progress';
-    case 2:
-      return 'Submitted';
-    case 3:
-      return 'Completed';
-    default:
-      return 'Unknown';
-  }
-};
+import { getStatusText } from "@/types/Task";
 
 export default function TasksPage() {
   const { data: tasks, isLoading, error } = useTasks();

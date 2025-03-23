@@ -18,7 +18,34 @@ export interface TaskData {
       updated: string;
     };
   }
-  
+
+  export enum TaskStatus {
+    CREATED = 0,
+    IN_PROGRESS = 1,
+    SUBMITTED = 2,
+    COMPLETED = 3,
+  }
+
+  export const stringToTaskStatus = (status: string) => {
+    return TaskStatus[status as keyof typeof TaskStatus];
+  }
+
+
+  export const getStatusText = (status: number) => {
+    switch (status) {
+      case 0:
+        return 'Created';
+      case 1:
+        return 'In Progress';
+      case 2:
+        return 'Submitted';
+      case 3:
+        return 'Completed';
+      default:
+        return 'Unknown';
+    }
+  };
+
   export interface TaskResponse {
     status: number;
     message: string;
