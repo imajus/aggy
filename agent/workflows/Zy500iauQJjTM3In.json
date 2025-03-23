@@ -1,6 +1,6 @@
 {
   "createdAt": "2025-03-20T18:55:17.959Z",
-  "updatedAt": "2025-03-23T05:36:43.000Z",
+  "updatedAt": "2025-03-23T05:59:12.000Z",
   "id": "Zy500iauQJjTM3In",
   "name": "Aggy AI agent",
   "active": true,
@@ -131,7 +131,8 @@
         240
       ],
       "id": "f436215b-7cc3-41f2-a35a-274780acb058",
-      "name": "Calculator"
+      "name": "Calculator",
+      "disabled": true
     },
     {
       "parameters": {
@@ -243,6 +244,21 @@
     },
     {
       "parameters": {
+        "name": "Get_User_Id",
+        "description": "Call this tool to determine if the user has signed in and get the user ID for using in other tools. It returns string value of user ID. It returns empty string for non-logged in users. It accepts no arguments.",
+        "jsCode": "\nif ($(\"Autonome Webhook\").isExecuted) {\n  return $(\"Autonome Webhook\").item.json.body.userId ?? '';\n}\nreturn '';"
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolCode",
+      "typeVersion": 1.1,
+      "position": [
+        1200,
+        240
+      ],
+      "id": "ab1afd70-a743-4394-b419-6cbcfb039585",
+      "name": "Get user ID"
+    },
+    {
+      "parameters": {
         "model": {
           "__rl": true,
           "value": "meta-llama/Llama-3.1-8B-Instruct",
@@ -268,18 +284,53 @@
     },
     {
       "parameters": {
-        "name": "Get_User_Id",
-        "description": "Call this tool to determine if the user has signed in and get the user ID for using in other tools. It returns string value of user ID. It returns empty string for non-logged in users. It accepts no arguments.",
-        "jsCode": "\nif ($(\"Autonome Webhook\").isExecuted) {\n  return $(\"Autonome Webhook\").item.json.body.userId ?? '';\n}\nreturn '';"
+        "name": "Insert_Task_Private_Data",
+        "description": "Call this tool to attach private data to the task by its ID.",
+        "workflowId": {
+          "__rl": true,
+          "value": "QBI6a9zMRJaErfqI",
+          "mode": "list",
+          "cachedResultName": "Nillion SecretVault: Insert Task data"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "taskId": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('taskId', `Task ID which is returned from the Create_Task tool call.`, 'string') }}",
+            "data": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('data', `Raw string containing private data to store to be consumed by a human.`, 'string') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "taskId",
+              "displayName": "taskId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "data",
+              "displayName": "data",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
       },
-      "type": "@n8n/n8n-nodes-langchain.toolCode",
-      "typeVersion": 1.1,
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.1,
       "position": [
-        1200,
-        240
+        1000,
+        380
       ],
-      "id": "ab1afd70-a743-4394-b419-6cbcfb039585",
-      "name": "Get user ID"
+      "id": "ca2cb404-74ba-4805-9cb8-f4f5da01d394",
+      "name": "Nillion SecretVault"
     },
     {
       "parameters": {
@@ -293,11 +344,11 @@
       "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
       "typeVersion": 1.2,
       "position": [
-        620,
-        280
+        640,
+        300
       ],
-      "id": "caed5ec1-af4c-402a-abda-d13da5d60604",
-      "name": "OpenAI LLM",
+      "id": "b3f5b1a3-8101-4ec8-9007-98b85ccc8691",
+      "name": "OpenAI Chat Model",
       "credentials": {
         "openAiApi": {
           "id": "l3PyuxSuNhOWKxdX",
@@ -395,11 +446,6 @@
         ]
       ]
     },
-    "Nillion LLM": {
-      "ai_languageModel": [
-        []
-      ]
-    },
     "Get user ID": {
       "ai_tool": [
         [
@@ -411,7 +457,23 @@
         ]
       ]
     },
-    "OpenAI LLM": {
+    "Nillion LLM": {
+      "ai_languageModel": [
+        []
+      ]
+    },
+    "Nillion SecretVault": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
       "ai_languageModel": [
         [
           {
@@ -430,31 +492,8 @@
   "meta": {
     "templateCredsSetupCompleted": true
   },
-  "pinData": {
-    "Autonome Webhook": [
-      {
-        "json": {
-          "headers": {
-            "host": "localhost:3000",
-            "user-agent": "curl/8.5.0",
-            "accept": "*/*",
-            "content-type": "application/json",
-            "content-length": "126"
-          },
-          "params": {},
-          "query": {},
-          "body": {
-            "text": "Good to go",
-            "sessionId": "5c4d216df52c492597f209b995f85142",
-            "userId": "cm8k7kgle005mday68m1l2zlz"
-          },
-          "webhookUrl": "http://localhost:3000/webhook-test/02f1ac90-0c99-44fe-844f-e657ea21798d",
-          "executionMode": "test"
-        }
-      }
-    ]
-  },
-  "versionId": "41178c81-8379-4c85-b44c-335092f427eb",
+  "pinData": {},
+  "versionId": "6553e1a6-ec3d-40ef-a325-bebfd90d1b3c",
   "triggerCount": 3,
   "tags": []
 }

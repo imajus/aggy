@@ -1,0 +1,285 @@
+{
+  "createdAt": "2025-03-23T06:04:43.636Z",
+  "updatedAt": "2025-03-23T06:22:00.000Z",
+  "id": "iiEWQuPdY1KZKLol",
+  "name": "Aggy: Get Task private data",
+  "active": false,
+  "nodes": [
+    {
+      "parameters": {
+        "path": "95010b94-c3b3-43ae-9c0d-c843568ac6ea",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "3814da00-55ef-4a84-88d0-cba1970fd9c5",
+      "name": "Webhook",
+      "webhookId": "95010b94-c3b3-43ae-9c0d-c843568ac6ea"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "F6OMzoLFoQgxb5TJ",
+          "mode": "list",
+          "cachedResultName": "Privy: Get user wallet data"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "userId": "={{ $json.query.userId }}"
+          },
+          "matchingColumns": [
+            "userId"
+          ],
+          "schema": [
+            {
+              "id": "userId",
+              "displayName": "userId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "mode": "each",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        220,
+        0
+      ],
+      "id": "9a0de8e0-c67d-42fa-8fd5-29b7eddb5dbd",
+      "name": "Get wallet data"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.MULTIBAAS_URL }}/addresses/aggy_task_factory/contracts/aggy_task_factory/methods/getTaskById",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "args",
+              "value": "={{ [$('Webhook').item.json.query.taskId] }}"
+            },
+            {
+              "name": "from",
+              "value": "={{ $json.address }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        440,
+        0
+      ],
+      "id": "5f02c713-e48a-40de-a4af-228d6fae3ac8",
+      "name": "Get task data",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "Kcme09pJN7p2gcFw",
+          "name": "MultiBaaS account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "15f65d40-7da3-43ed-b581-41174fa9d436",
+              "leftValue": "={{ $json.result.output.state.contractor }}",
+              "rightValue": "={{ $('Get wallet data').item.json.address }}",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            },
+            {
+              "id": "7f521339-632f-47cc-bfb8-06f9c0bdcd9b",
+              "leftValue": "DEBUG",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        660,
+        0
+      ],
+      "id": "529c2e64-7a29-47b6-82b7-bad8278e9a51",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "YGcHT3h960D0pDyR",
+          "mode": "list",
+          "cachedResultName": "Nillion SecretVault: Get Task data"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "taskId": "={{ $json.result.output.data.id }}"
+          },
+          "matchingColumns": [
+            "taskId"
+          ],
+          "schema": [
+            {
+              "id": "taskId",
+              "displayName": "taskId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        880,
+        -100
+      ],
+      "id": "f0f11e0d-3784-48eb-8b3a-a65c6f7fc652",
+      "name": "Execute Workflow"
+    },
+    {
+      "parameters": {
+        "errorMessage": "Permission denied!"
+      },
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        880,
+        100
+      ],
+      "id": "97d11483-2110-4268-ac7e-d77a565d380a",
+      "name": "Stop and Error"
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Get wallet data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get wallet data": {
+      "main": [
+        [
+          {
+            "node": "Get task data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get task data": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Execute Workflow",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Stop and Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {
+    "Webhook": [
+      {
+        "json": {
+          "headers": {
+            "host": "localhost:3000",
+            "user-agent": "curl/8.5.0",
+            "accept": "*/*"
+          },
+          "params": {},
+          "query": {
+            "userId": "cm8k7kgle005mday68m1l2zlz",
+            "taskId": "5b75fa88-9f64-41f9-8757-ace0e5012931"
+          },
+          "body": {},
+          "webhookUrl": "http://localhost:3000/webhook-test/95010b94-c3b3-43ae-9c0d-c843568ac6ea",
+          "executionMode": "test"
+        }
+      }
+    ]
+  },
+  "versionId": "aa9cedb1-6138-4e68-b002-d5e0c43ebef7",
+  "triggerCount": 0,
+  "tags": []
+}
