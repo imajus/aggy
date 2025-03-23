@@ -9,7 +9,7 @@ export default function Header() {
       <div className="flex items-center space-x-4">
         <LoginWalletButton />
         <EmbeddedWalletDisplay />
-        <AggyBalanceDisplay balance={123.45} />
+        <AggyBalanceDisplay/>
       </div>
     </header>
   );
