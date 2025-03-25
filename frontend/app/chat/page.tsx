@@ -1,9 +1,10 @@
 "use client";
 
 import { v4 as uuid } from 'uuid';
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { usePrivy } from '@privy-io/react-auth';
+import ReactMarkdown from 'react-markdown';
 import { Button } from "@/components/Button";
 import { Input } from "@/components/Input";
 import { Card } from "@/components/Card";
@@ -21,6 +22,15 @@ export default function ChatPage() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [sessionId] = useState(uuid());
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
 
   const sendMessage = () => {
     if (!input.trim()) return;
@@ -43,21 +53,24 @@ export default function ChatPage() {
       <div className="flex-1 flex-grow">
         <Card className="h-150 overflow-y-auto">
           {messages.map((msg, idx) => (
-            <div key={idx} className="mb-4 last:mb-0">
+            <div key={idx} className="mb-4 last:mb-0 flex">
               <div
-                className={`inline-block p-3 rounded-lg ${
+                className={`p-3 rounded-lg max-w-[80%] ${
                   msg.user === "hirer"
-                    ? "bg-[#2B6CB0] text-white ml-auto"
-                    : "bg-[#EDF2F7] text-[#3173e2]"
+                    ? "bg-[#2B6CB0] text-white mr-auto"
+                    : "bg-[#EDF2F7] text-[#3173e2] ml-auto"
                 }`}
               >
                 <p className="text-sm font-medium mb-1">
                   {msg.user === "hirer" ? "You" : "AI"}
                 </p>
-                <p>{msg.text}</p>
+                <div className="prose prose-sm max-w-none dark:prose-invert">
+                  <ReactMarkdown>{msg.text}</ReactMarkdown>
+                </div>
               </div>
             </div>
           ))}
+          <div ref={messagesEndRef} />
         </Card>
       </div>
 
