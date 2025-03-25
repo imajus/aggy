@@ -34,5 +34,7 @@ module.exports = {
       // spacing, borderRadius, etc. if you wish
     },
   },
-  plugins: [],
+  plugins: [
+    require('@tailwindcss/typography'),
+  ],
 };
