@@ -1,0 +1,55 @@
+import { Inter } from "next/font/google";
+import Link from "next/link";
+import "./globals.css";
+
+const inter = Inter({ subsets: ["latin"] });
+
+const sidebarItems = [
+  { name: "Chat", path: "/chat" },
+  { name: "Open Tasks", path: "/tasks" },
+  { name: "Tasks in Review", path: "/reviewed" },
+  { name: "Completed Tasks", path: "/completed" },
+];
+
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <html lang="en">
+      <body className={inter.className}>
+        <div className="min-h-screen flex flex-col">
+          {/* Header */}
+          <header className="border-b">
+            <div className="container mx-auto px-4 h-16 flex items-center">
+              <h1 className="text-2xl font-bold">Aggy</h1>
+            </div>
+          </header>
+
+          <div className="flex flex-1">
+            {/* Sidebar */}
+            <aside className="w-64 border-r bg-muted/30">
+              <nav className="p-4 space-y-2">
+                {sidebarItems.map((item) => (
+                  <Link
+                    key={item.path}
+                    href={item.path}
+                    className="block px-4 py-2 rounded-md hover:bg-muted transition-colors"
+                  >
+                    {item.name}
+                  </Link>
+                ))}
+              </nav>
+            </aside>
+
+            {/* Main content */}
+            <main className="flex-1">
+              {children}
+            </main>
+          </div>
+        </div>
+      </body>
+    </html>
+  );
+} 
