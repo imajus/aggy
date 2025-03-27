@@ -42,6 +42,7 @@ export function TasksList({ tasks, title }: TasksListProps) {
                 <p className="text-muted-foreground mt-1">{task.details}</p>
               </div>
               <Badge 
+                variant="default"
                 className={`${STATUS_MAP[task.status].color} text-white`}
               >
                 {STATUS_MAP[task.status].label}
