@@ -1,14 +1,13 @@
-import Theme from 'tailwindcss/defaultTheme';
-console.dir(Theme);
+import type { Config } from 'tailwindcss';
+import defaultTheme from 'tailwindcss/defaultTheme';
 
-/** @type {import('tailwindcss').Config} */
-module.exports = {
-  darkMode: ['class'],
+const config: Config = {
+  darkMode: 'class',
   content: [
-    './pages/**/*.{js,jsx}',
-    './componenjs/**/*.{js,jsx}',
-    './app/**/*.{js,jsx}',
-    './src/**/*.{js,jsx}',
+    './pages/**/*.{js,jsx,ts,tsx}',
+    './components/**/*.{js,jsx,ts,tsx}',
+    './app/**/*.{js,jsx,ts,tsx}',
+    './src/**/*.{js,jsx,ts,tsx}',
   ],
   theme: {
     container: {
@@ -60,16 +59,19 @@ module.exports = {
         sm: 'calc(var(--radius) - 4px)',
       },
       fontFamily: {
-        sans: ['var(--font-sans)', ...fontFamily.sans],
+        sans: [
+          'var(--font-sans)',
+          ...(defaultTheme.fontFamily.sans as string[]),
+        ],
       },
       keyframes: {
         'accordion-down': {
-          from: { height: 0 },
+          from: { height: '0' },
           to: { height: 'var(--radix-accordion-content-height)' },
         },
         'accordion-up': {
           from: { height: 'var(--radix-accordion-content-height)' },
-          to: { height: 0 },
+          to: { height: '0' },
         },
       },
       animation: {
@@ -80,3 +82,5 @@ module.exports = {
   },
   plugins: [require('tailwindcss-animate')],
 };
+
+export default config;

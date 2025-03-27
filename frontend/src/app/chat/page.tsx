@@ -87,7 +87,7 @@ export default function ChatPage() {
           placeholder="Type your message..."
           className="flex-1"
         />
-        <Button type="submit">Send</Button>
+        <Button type="submit" className="px-4" variant="default" size="default">Send</Button>
       </form>
     </div>
   );
