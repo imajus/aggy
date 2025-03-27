@@ -5,7 +5,7 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 
 const sidebarItems = [
-  { name: "Chat", path: "/chat" },
+  { name: "Chat", path: "/" },
   { name: "Open Tasks", path: "/tasks" },
   { name: "Tasks in Review", path: "/reviewed" },
   { name: "Completed Tasks", path: "/completed" },
@@ -19,10 +19,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <div className="min-h-screen flex flex-col">
+        <div className="min-h-screen flex flex-col mx-auto max-w-7xl">
           {/* Header */}
           <header className="border-b">
-            <div className="container mx-auto px-4 h-16 flex items-center">
+            <div className="px-4 h-16 flex items-center">
               <h1 className="text-2xl font-bold">Aggy</h1>
             </div>
           </header>
