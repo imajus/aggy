@@ -2,14 +2,13 @@
 
 import { useEffect, useState } from 'react';
 import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
-import { formatDistanceToNow } from 'date-fns';
 import { fetchTasks, approveToken, claimTask, completeTask, fetchTaskPrivateData } from '@/lib/api';
 import { usePrivy, useSendTransaction, WalletWithMetadata } from '@privy-io/react-auth';
 import { useRouter } from 'next/navigation';
+import { TaskCard } from './TaskCard';
 
 export interface Task {
   id: string;
@@ -42,7 +41,7 @@ interface TasksListProps {
 }
 
 export function TasksList({ title, filterStatus, showOnlyMine }: TasksListProps) {
-  const [tasks, setTasks] = useState<TaskWithPrivateData[]>([]);
+  const [tasks, setTasks] = useState<Task[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [claimingTaskId, setClaimingTaskId] = useState<string | null>(null);
@@ -79,27 +78,8 @@ export function TasksList({ title, filterStatus, showOnlyMine }: TasksListProps)
       const sortedTasks = [...filteredTasks].sort((a, b) => {
         return b.deadline - a.deadline;
       });
-
-      // Fetch private data for in-progress tasks assigned to the user
-      const tasksWithPrivateData = await Promise.all(
-        sortedTasks.map(async (task) => {
-          if (
-            task.status === 1 && 
-            task.contractor === delegatedWallet?.address
-          ) {
-            try {
-              const privateData = await fetchTaskPrivateData(user.id, task.id);
-              return { ...task, privateData };
-            } catch (error) {
-              console.error(`Failed to fetch private data for task ${task.id}:`, error);
-              return task;
-            }
-          }
-          return task;
-        })
-      );
       
-      setTasks(tasksWithPrivateData);
+      setTasks(sortedTasks);
     } catch (err) {
       setError('Failed to load tasks');
       console.error(err);
@@ -216,87 +196,16 @@ export function TasksList({ title, filterStatus, showOnlyMine }: TasksListProps)
         ) : (
           <div className="grid gap-4">
             {tasks.map((task) => (
-              <Card key={task.id} className="p-6">
-                <div className="flex justify-between items-start mb-4">
-                  <div>
-                    <h2 className="text-xl font-semibold">{task.name}</h2>
-                    <p className="text-muted-foreground mt-1">{task.details}</p>
-                    {task.status === 2 && (
-                      <a
-                        href={`https://testnet.oracle.uma.xyz/?search=${task.id}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-sm text-blue-500 hover:text-blue-600 hover:underline mt-2 inline-block"
-                      >
-                        Check the review progress
-                      </a>
-                    )}
-                    {task.status === 1 && 
-                      task.contractor === delegatedWallet?.address && 
-                      task.privateData && (
-                      <div className="mt-4">
-                        <h3 className="font-medium text-sm">Private Data</h3>
-                        <p className="text-sm text-muted-foreground mt-1">
-                          {task.privateData}
-                        </p>
-                      </div>
-                    )}
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Badge 
-                      variant="default"
-                      className={`${STATUS_MAP[task.status].color} text-white`}
-                    >
-                      {STATUS_MAP[task.status].label}
-                    </Badge>
-                    {task.status === 0 && authenticated && delegatedWallet && (
-                      <Button
-                        size="sm"
-                        variant="default"
-                        className="text-white"
-                        onClick={() => handleClaimTask(task)}
-                        disabled={claimingTaskId === task.id}
-                      >
-                        {claimingTaskId === task.id ? 'Claiming...' : 'Claim Task'}
-                      </Button>
-                    )}
-                    {task.status === 1 && 
-                      authenticated && 
-                      delegatedWallet &&
-                      task.contractor === delegatedWallet.address && (
-                      <Button
-                        size="sm"
-                        variant="default"
-                        className="bg-blue-500 hover:bg-blue-600"
-                        onClick={() => handleSubmitResult(task)}
-                      >
-                        Submit Result
-                      </Button>
-                    )}
-                  </div>
-                </div>
-                
-                <div className="grid grid-cols-3 gap-4 text-sm">
-                  <div>
-                    <p className="text-muted-foreground">Deadline</p>
-                    <p className="font-medium">
-                      {formatDistanceToNow(task.deadline, { addSuffix: true })}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-muted-foreground">Reward</p>
-                    <p className="font-medium text-green-600">
-                      {task.reward} AGGY
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-muted-foreground">Penalty</p>
-                    <p className="font-medium text-red-600">
-                      {task.penalty} AGGY
-                    </p>
-                  </div>
-                </div>
-              </Card>
+              <TaskCard
+                key={task.id}
+                task={task}
+                delegatedWallet={delegatedWallet}
+                authenticated={authenticated}
+                claimingTaskId={claimingTaskId}
+                userId={user?.id}
+                onClaimTask={handleClaimTask}
+                onSubmitResult={handleSubmitResult}
+              />
             ))}
           </div>
         )}
