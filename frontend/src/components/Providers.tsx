@@ -7,7 +7,7 @@ import { sepolia } from 'viem/chains';
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <PrivyProvider
-      appId="cm8ihdh9201yn452te2rietk3"
+      appId={process.env.NEXT_PUBLIC_PRIVY_APP_ID}
       config={{
         loginMethods: ['wallet', 'telegram', 'email', 'google'],
         appearance: {

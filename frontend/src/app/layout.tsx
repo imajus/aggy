@@ -9,6 +9,7 @@ const inter = Inter({ subsets: ["latin"] });
 const sidebarItems = [
   { name: "Chat", path: "/" },
   { name: "Open Tasks", path: "/tasks" },
+  { name: "My Tasks", path: "/my-tasks" },
   { name: "Tasks in Review", path: "/reviewed" },
   { name: "Completed Tasks", path: "/completed" },
 ];
