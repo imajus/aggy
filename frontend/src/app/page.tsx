@@ -9,6 +9,7 @@ import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { usePrivy } from '@privy-io/react-auth';
 
 interface Message {
   id: string;
@@ -18,6 +19,7 @@ interface Message {
 }
 
 export default function ChatPage() {
+  const { user } = usePrivy();
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -52,6 +54,7 @@ export default function ChatPage() {
         body: JSON.stringify({
           text: input,
           sessionId: sessionId,
+          userId: user?.id,
         }),
       });
 
