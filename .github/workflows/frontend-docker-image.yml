@@ -40,8 +40,8 @@ jobs:
             ghcr.io/${{ github.repository }}:${{ github.sha }}
             ghcr.io/${{ github.repository }}:latest
           build-args: |
-            NEXT_PUBLIC_MULTIBAAS_CHAIN_ID=${{ vars.NEXT_PUBLIC_MULTIBAAS_CHAIN_ID }}
-            NEXT_PUBLIC_PRIVY_APP_ID=${{ vars.NEXT_PUBLIC_PRIVY_APP_ID }}
-            NEXT_PUBLIC_MULTIBAAS_URL=${{ vars.NEXT_PUBLIC_MULTIBAAS_URL }}
-            NEXT_PUBLIC_MULTIBAAS_KEY=${{ vars.NEXT_PUBLIC_MULTIBAAS_KEY }}
-            NEXT_PUBLIC_AGENT_URL=${{ vars.NEXT_PUBLIC_AGENT_URL }}
+            MULTIBAAS_CHAIN_ID=${{ vars.MULTIBAAS_CHAIN_ID }}
+            PRIVY_APP_ID=${{ vars.PRIVY_APP_ID }}
+            MULTIBAAS_URL=${{ vars.MULTIBAAS_URL }}
+            MULTIBAAS_KEY=${{ vars.MULTIBAAS_KEY }}
+            AGENT_URL=${{ vars.AGENT_URL }}
