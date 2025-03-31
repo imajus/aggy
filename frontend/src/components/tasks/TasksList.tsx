@@ -21,10 +21,6 @@ export interface Task {
   contractor: string | null;
 }
 
-interface TaskWithPrivateData extends Task {
-  privateData?: string;
-}
-
 export const STATUS_MAP = {
   0: { label: 'Created', color: 'bg-gray-500' },
   1: { label: 'In Progress', color: 'bg-blue-500' },
@@ -102,6 +98,8 @@ export function TasksList({ title, filterStatus, showOnlyMine }: TasksListProps)
         data: approveTx.data,
         value: approveTx.value,
         type: approveTx.type,
+        gasPrice: approveTx.gasPrice,
+        gasLimit: approveTx.gas,
         maxFeePerGas: approveTx.gasFeeCap,
         maxPriorityFeePerGas: approveTx.gasTipCap,
       });
@@ -115,6 +113,8 @@ export function TasksList({ title, filterStatus, showOnlyMine }: TasksListProps)
         data: claimTx.data,
         value: claimTx.value,
         type: claimTx.type,
+        gasPrice: approveTx.gasPrice,
+        gasLimit: approveTx.gas,
         maxFeePerGas: claimTx.gasFeeCap,
         maxPriorityFeePerGas: claimTx.gasTipCap,
       });
@@ -147,6 +147,8 @@ export function TasksList({ title, filterStatus, showOnlyMine }: TasksListProps)
         data: completeTx.data,
         value: completeTx.value,
         type: completeTx.type,
+        gasPrice: completeTx.gasPrice,
+        gasLimit: completeTx.gas,
         maxFeePerGas: completeTx.gasFeeCap,
         maxPriorityFeePerGas: completeTx.gasTipCap,
       });
