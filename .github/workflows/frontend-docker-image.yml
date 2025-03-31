@@ -2,7 +2,10 @@ name: Frontend Image CI
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main", "feature/new-frontend" ]
+    paths:
+      - "frontend/**"
+      - ".github/workflows/frontend-docker-image.yml"
 
 jobs:
   push_to_registries:
