@@ -24,6 +24,18 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
+ARG MULTIBAAS_CHAIN_ID
+ARG PRIVY_APP_ID
+ARG MULTIBAAS_URL
+ARG MULTIBAAS_KEY
+ARG AGENT_URL
+
+ENV NEXT_PUBLIC_MULTIBAAS_CHAIN_ID=$MULTIBAAS_CHAIN_ID
+ENV NEXT_PUBLIC_PRIVY_APP_ID=$PRIVY_APP_ID
+ENV NEXT_PUBLIC_MULTIBAAS_URL=$MULTIBAAS_URL
+ENV NEXT_PUBLIC_MULTIBAAS_KEY=$MULTIBAAS_KEY
+ENV NEXT_PUBLIC_AGENT_URL=$AGENT_URL
+
 # Next.js collects completely anonymous telemetry data about general usage.
 # Learn more here: https://nextjs.org/telemetry
 # Uncomment the following line in case you want to disable telemetry during the build.
